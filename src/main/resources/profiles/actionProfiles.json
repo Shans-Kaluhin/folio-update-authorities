@@ -1,0 +1,26 @@
+{
+  "id": "d14c3aa4-8d98-4c90-beac-71105a44711b",
+  "profile": {
+    "id": "d14c3aa4-8d98-4c90-beac-71105a44711b",
+    "name": "Release Upgrade - Migrate MARC authority records ",
+    "description": "",
+    "action": "UPDATE",
+    "folioRecord": "MARC_AUTHORITY",
+    "deleted": false,
+    "parentProfiles": [],
+    "childProfiles": [],
+    "hidden": true
+  },
+  "addedRelations": [
+    {
+      "id": "48644473-c3e6-419c-b693-102544a569d6",
+      "masterProfileId": "d14c3aa4-8d98-4c90-beac-71105a44711b",
+      "detailProfileId": "d2dcffac-b5b1-40b7-aaf0-27d6a0987885",
+      "order": 0,
+      "triggered": false,
+      "masterProfileType": "ACTION_PROFILE",
+      "detailProfileType": "MAPPING_PROFILE"
+    }
+  ],
+  "deletedRelations": []
+}

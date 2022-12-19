@@ -1,0 +1,66 @@
+{
+  "id": "ed99eff1-a008-47ff-b2e3-763315a01d9e",
+  "profile": {
+    "id": "ed99eff1-a008-47ff-b2e3-763315a01d9e",
+    "name": "Release Upgrade - Migrate MARC authority records",
+    "description": "",
+    "incomingRecordType": "MARC_AUTHORITY",
+    "existingRecordType": "MARC_AUTHORITY",
+    "matchDetails": [
+      {
+        "incomingRecordType": "MARC_AUTHORITY",
+        "existingRecordType": "MARC_AUTHORITY",
+        "incomingMatchExpression": {
+          "dataValueType": "VALUE_FROM_RECORD",
+          "fields": [
+            {
+              "label": "field",
+              "value": "999"
+            },
+            {
+              "label": "indicator1",
+              "value": "f"
+            },
+            {
+              "label": "indicator2",
+              "value": "f"
+            },
+            {
+              "label": "recordSubfield",
+              "value": "s"
+            }
+          ],
+          "qualifier": {}
+        },
+        "matchCriterion": "EXACTLY_MATCHES",
+        "existingMatchExpression": {
+          "dataValueType": "VALUE_FROM_RECORD",
+          "fields": [
+            {
+              "label": "field",
+              "value": "999"
+            },
+            {
+              "label": "indicator1",
+              "value": "f"
+            },
+            {
+              "label": "indicator2",
+              "value": "f"
+            },
+            {
+              "label": "recordSubfield",
+              "value": "s"
+            }
+          ]
+        }
+      }
+    ],
+    "deleted": false,
+    "parentProfiles": [],
+    "childProfiles": [],
+    "hidden": true
+  },
+  "addedRelations": [],
+  "deletedRelations": []
+}

@@ -1,0 +1,39 @@
+{
+  "id": "d2dcffac-b5b1-40b7-aaf0-27d6a0987885",
+  "profile": {
+    "id": "d2dcffac-b5b1-40b7-aaf0-27d6a0987885",
+    "name": " Release Upgrade - Migrate MARC authority records",
+    "description": "",
+    "incomingRecordType": "MARC_AUTHORITY",
+    "existingRecordType": "MARC_AUTHORITY",
+    "deleted": false,
+    "marcFieldProtectionSettings": [],
+    "parentProfiles": [],
+    "childProfiles": [],
+    "mappingDetails": {
+      "name": "marcAuthority",
+      "recordType": "MARC_AUTHORITY",
+      "mappingFields": [
+        {
+          "name": "discoverySuppress",
+          "enabled": "true",
+          "path": "marcAuthority.discoverySuppress",
+          "booleanFieldAction": "IGNORE",
+          "subfields": []
+        },
+        {
+          "name": "hrid",
+          "enabled": "true",
+          "path": "marcAuthority.hrid",
+          "value": "",
+          "subfields": []
+        }
+      ],
+      "marcMappingDetails": [],
+      "marcMappingOption": "UPDATE"
+    },
+    "hidden": true
+  },
+  "addedRelations": [],
+  "deletedRelations": []
+}

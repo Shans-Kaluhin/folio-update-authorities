@@ -1,0 +1,36 @@
+{
+  "id": "a2db814f-1106-4b08-90e0-39e2647e5438",
+  "profile": {
+    "id": "a2db814f-1106-4b08-90e0-39e2647e5438",
+    "name": "Release Upgrade - Migrate MARC authority records",
+    "description": "",
+    "dataType": "MARC",
+    "deleted": false,
+    "parentProfiles": [],
+    "childProfiles": [],
+    "hidden": true
+  },
+  "addedRelations": [
+    {
+      "id": "bfbda00b-8ca8-4955-b568-27da941eb562",
+      "masterProfileId": "a2db814f-1106-4b08-90e0-39e2647e5438",
+      "detailProfileId": "ed99eff1-a008-47ff-b2e3-763315a01d9e",
+      "order": 0,
+      "triggered": false,
+      "masterProfileType": "JOB_PROFILE",
+      "detailProfileType": "MATCH_PROFILE"
+    },
+    {
+      "id": "c3e82c25-cde9-4af8-9ad8-6630c70facb6",
+      "masterProfileId": "ed99eff1-a008-47ff-b2e3-763315a01d9e",
+      "detailProfileId": "d14c3aa4-8d98-4c90-beac-71105a44711b",
+      "order": 0,
+      "reactTo": "MATCH",
+      "triggered": false,
+      "masterProfileType": "MATCH_PROFILE",
+      "detailProfileType": "ACTION_PROFILE",
+      "jobProfileId": "a2db814f-1106-4b08-90e0-39e2647e5438"
+    }
+  ],
+  "deletedRelations": []
+}
