@@ -1,6 +1,7 @@
 package org.folio;
 
 import org.folio.service.UpdateAuthoritiesService;
+import org.folio.util.FileWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +37,8 @@ public class FolioUpdateAuthoritiesApp implements CommandLineRunner {
             exitWithError("Please specify all parameters: configuration .json file path");
         }
 
-        File configurationFile = new File(args[0]);
+        FileWorker.configurationFile = new File(args[0]);
 
-        service.start(configurationFile);
+        service.start();
     }
 }

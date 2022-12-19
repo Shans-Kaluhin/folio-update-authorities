@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import static org.folio.model.enums.JobStatus.CANCELLED;
+import static org.folio.model.enums.JobStatus.COMMITTED;
 import static org.folio.model.enums.JobStatus.ERROR;
 
 public class DataImportService {
@@ -27,7 +28,7 @@ public class DataImportService {
 
         dataImportClient.uploadFile(uploadDefinition);
         dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
-        //waitStatus(uploadDefinition.getJobExecutionId(), COMMITTED);
+        waitStatus(uploadDefinition.getJobExecutionId(), COMMITTED);
 
         return uploadDefinition.getJobExecutionId();
     }

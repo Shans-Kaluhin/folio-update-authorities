@@ -2,9 +2,11 @@ package org.folio.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.folio.model.Configuration;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +20,20 @@ import static org.folio.FolioUpdateAuthoritiesApp.exitWithError;
 public class FileWorker {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static File configurationFile;
+
+    public static Configuration getConfiguration() {
+        return getMappedFile(configurationFile, Configuration.class);
+    }
+
+    public static void updateConfiguration(Configuration configuration) {
+        try (FileWriter fileWriter = new FileWriter(configurationFile)) {
+            var objectWriter = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
+            fileWriter.write(objectWriter.writeValueAsString(configuration));
+        } catch (IOException e) {
+            exitWithError("Failed to update configuration file");
+        }
+    }
 
     public static Path writeFile(String name, List<String> strings) {
         try {
@@ -41,17 +57,7 @@ public class FileWorker {
         }
     }
 
-    public static <T> T getMappedResourceFile(String name, Class<T> clazz) {
-        try {
-            var file = getResourceFile(name);
-            return OBJECT_MAPPER.readValue(file, clazz);
-        } catch (IOException e) {
-            exitWithError("Failed to map file value: " + name);
-            return null;
-        }
-    }
-
-    public static <T> T getMappedResourceFile(File file, Class<T> clazz) {
+    public static <T> T getMappedFile(File file, Class<T> clazz) {
         try {
             return OBJECT_MAPPER.readValue(file, clazz);
         } catch (IOException e) {

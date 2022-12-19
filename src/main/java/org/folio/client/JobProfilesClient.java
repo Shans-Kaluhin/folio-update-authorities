@@ -16,21 +16,20 @@ public class JobProfilesClient {
 
     public void createJobProfile(JobProfile jobProfile) {
         var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl();
-        var profile = getJsonObject(jobProfile.getUrl());
+        var profile = getJsonObject(jobProfile.getUrl() + ".json");
 
         var request = httpWorker.constructPOSTRequest(url, profile.toString());
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 201, "Failed to create job profile");
+        httpWorker.verifyStatus(response, 201, "Failed to create " + jobProfile);
     }
 
     public void deleteJobProfile(JobProfile jobProfile) {
         var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl() + '/' + jobProfile.getId();
-        var profile = getJsonObject(jobProfile.getUrl());
 
         var request = httpWorker.constructDELETERequest(url);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 204, "Failed to create job profile");
+        httpWorker.verifyStatus(response, 204, "Failed to delete " + jobProfile);
     }
 }

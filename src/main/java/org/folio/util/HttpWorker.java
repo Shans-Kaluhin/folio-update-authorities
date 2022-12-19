@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithError;
 
@@ -35,6 +37,15 @@ public class HttpWorker {
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
     }
+
+    @SneakyThrows
+    public HttpRequest constructPOSTRequest(String uri, Path filePath) {
+        return constructRequest(uri)
+                .header("Content-Type", "application/octet-stream")
+                .POST(HttpRequest.BodyPublishers.ofByteArray(Files.readAllBytes(filePath)))
+                .build();
+    }
+
     public HttpRequest.Builder constructRequest(String uri) {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(configuration.getOkapiUrl() + uri))

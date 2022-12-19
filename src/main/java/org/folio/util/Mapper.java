@@ -10,8 +10,6 @@ import org.folio.model.ParsedRecord;
 import org.folio.model.UploadDefinition;
 import org.folio.processor.rule.DataSource;
 import org.folio.reader.values.CompositeValue;
-import org.folio.reader.values.RuleValue;
-import org.folio.reader.values.SimpleValue;
 import org.folio.reader.values.StringValue;
 
 import java.net.http.HttpResponse;

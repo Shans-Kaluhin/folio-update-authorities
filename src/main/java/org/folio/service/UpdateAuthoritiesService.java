@@ -5,13 +5,12 @@ import org.folio.client.DataImportClient;
 import org.folio.client.JobProfilesClient;
 import org.folio.client.SRSClient;
 import org.folio.model.Configuration;
+import org.folio.util.FileWorker;
 import org.folio.util.HttpWorker;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithMessage;
-import static org.folio.util.FileWorker.getMappedResourceFile;
+import static org.folio.util.FileWorker.deleteFile;
 
 @Service
 public class UpdateAuthoritiesService {
@@ -20,15 +19,18 @@ public class UpdateAuthoritiesService {
     private MarcConverterService marcConverterService;
     private JobProfileService jobProfileService;
 
-    public void start(File configurationFile) {
-        var configuration = getMappedResourceFile(configurationFile, Configuration.class);
-        var httpWorker = new HttpWorker(configuration);
+    private Configuration configuration;
 
+
+    public void start() {
+        configuration = FileWorker.getConfiguration();
+
+        var httpWorker = new HttpWorker(configuration);
         var authClient = new AuthClient(configuration, httpWorker);
         var importClient = new DataImportClient(httpWorker);
         var jobProfileClient = new JobProfilesClient(httpWorker);
 
-        srsClient = new SRSClient(httpWorker, configuration);
+        srsClient = new SRSClient(httpWorker);
         importService = new DataImportService(importClient);
         jobProfileService = new JobProfileService(jobProfileClient);
         marcConverterService = new MarcConverterService();
@@ -40,15 +42,24 @@ public class UpdateAuthoritiesService {
     }
 
     private String updateAuthorities() {
-        var records = srsClient.retrieveRecords();
-        var mrcFile = marcConverterService.writeRecords(records);
-
         jobProfileService.populateProfiles();
 
-        importService.updateAuthority(mrcFile);
+        var totalRecords = srsClient.retrieveTotalRecords();
+        while (configuration.getOffset() < totalRecords) {
+            var records = srsClient.retrieveRecords(configuration.getLimit(), configuration.getOffset());
+            incrementOffset(configuration, records.size());
 
-        jobProfileService.deleteProfiles();
+            var mrcFile = marcConverterService.writeRecords(records);
+            importService.updateAuthority(mrcFile);
+            deleteFile(mrcFile);
+        }
 
-        return "Jobs for updating authorities started";
+       // jobProfileService.deleteProfiles();
+        return "Authorities was updated";
+    }
+
+    private void incrementOffset(Configuration configuration, int offset) {
+        configuration.incrementOffset(offset);
+        FileWorker.updateConfiguration(configuration);
     }
 }
