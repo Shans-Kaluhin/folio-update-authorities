@@ -1,24 +1,25 @@
 package org.folio.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.folio.model.ParsedRecord;
 import org.folio.util.MarcRecordWriter;
 import org.folio.writer.RecordWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.folio.mapper.MarcMapper.mapToCompositeValue;
+import static org.folio.mapper.MarcMapper.mapToStringValue;
 import static org.folio.util.FileWorker.writeFile;
-import static org.folio.util.Mapper.mapToCompositeValue;
-import static org.folio.util.Mapper.mapToStringValue;
 
+@Slf4j
+@Service
 public class MarcConverterService {
-    private static final Logger LOG = LoggerFactory.getLogger(MarcConverterService.class);
     private static final String FILE_NAME = "Release Upgrade - Migrate MARC authority records.mrc";
 
     public Path writeRecords(List<ParsedRecord> records) {
-        LOG.info("Generating mrc file...");
+        log.info("Generating mrc file...");
 
         var mrcFile = records.stream()
                 .map(this::convertRecord)

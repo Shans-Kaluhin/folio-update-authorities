@@ -1,5 +1,6 @@
 package org.folio.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.folio.client.AuthClient;
 import org.folio.client.DataImportClient;
 import org.folio.client.JobProfilesClient;
@@ -7,17 +8,15 @@ import org.folio.client.SRSClient;
 import org.folio.model.Configuration;
 import org.folio.util.FileWorker;
 import org.folio.util.HttpWorker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithMessage;
 import static org.folio.util.FileWorker.deleteFile;
 import static org.folio.util.FileWorker.saveConfiguration;
 
+@Slf4j
 @Service
 public class UpdateAuthoritiesService {
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateAuthoritiesService.class);
     private SRSClient srsClient;
     private Configuration configuration;
     private DataImportService importService;
@@ -63,21 +62,21 @@ public class UpdateAuthoritiesService {
     }
 
     private void validateTotalRecords(int totalRecords) {
-        LOG.info("Total authority records: {}", totalRecords);
+        log.info("Total authority records: {}", totalRecords);
 
         if (totalRecords < 1) {
             exitWithMessage("There is no authorities to update");
         }
 
         if (configuration.getOffset() > 0) {
-            LOG.warn("Found the offset value. Update will start from {}", configuration.getOffset());
+            log.warn("Found the offset value. Update will start from {}", configuration.getOffset());
         }
 
         if (configuration.getOffset() >= totalRecords) {
-            LOG.warn("Offset is bigger then total records");
+            log.warn("Offset is bigger then total records");
             configuration.refreshOffset();
             saveConfiguration(configuration);
-            LOG.warn("Offset reset to 0");
+            log.warn("Offset reset to 0");
         }
     }
 }

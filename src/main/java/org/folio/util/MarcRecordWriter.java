@@ -12,25 +12,23 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.VariableField;
-import org.marc4j.marc.impl.LeaderImpl;
 import org.marc4j.marc.impl.SortedMarcFactoryImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class MarcRecordWriter extends AbstractRecordWriter {
-    protected String encoding;
-    private MarcFactory factory;
-    protected Record record;
+    private final MarcFactory factory;
+    protected final String encoding;
+    protected final Record record;
 
     public MarcRecordWriter(String leader) {
         this.encoding = StandardCharsets.UTF_8.name();
         this.factory = new SortedMarcFactoryImpl();
-        this.record = this.factory.newRecord(new LeaderImpl("00000nzm a2200000 a 4500"));
+        this.record = this.factory.newRecord(leader);
     }
 
     public void writeLeader(Translation translation) {
@@ -38,7 +36,6 @@ public class MarcRecordWriter extends AbstractRecordWriter {
             char[] implDefined2 = new char[]{translation.getParameter("position17").charAt(0), translation.getParameter("position18").charAt(0), translation.getParameter("position19").charAt(0)};
             this.record.getLeader().setImplDefined2(implDefined2);
         }
-
     }
 
     public void writeControlField(RecordControlField recordControlField) {
@@ -48,12 +45,10 @@ public class MarcRecordWriter extends AbstractRecordWriter {
 
     public void writeDataField(RecordDataField recordDataField) {
         DataField marcDataField = this.factory.newDataField(recordDataField.getTag(), recordDataField.getIndicator1(), recordDataField.getIndicator2());
-        Iterator var3 = recordDataField.getSubFields().iterator();
 
-        while(var3.hasNext()) {
-            Map.Entry<Character, String> subField = (Map.Entry)var3.next();
-            Character subFieldCode = (Character)subField.getKey();
-            String subFieldData = (String)subField.getValue();
+        for (Map.Entry<Character, String> subField : recordDataField.getSubFields()) {
+            Character subFieldCode = subField.getKey();
+            String subFieldData = subField.getValue();
             marcDataField.addSubfield(this.factory.newSubfield(subFieldCode, subFieldData));
         }
 

@@ -1,9 +1,8 @@
 package org.folio;
 
+import lombok.extern.slf4j.Slf4j;
 import org.folio.service.UpdateAuthoritiesService;
 import org.folio.util.FileWorker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,9 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.File;
 
+@Slf4j
 @SpringBootApplication
 public class FolioUpdateAuthoritiesApp implements CommandLineRunner {
-    private static final Logger LOG = LoggerFactory.getLogger(FolioUpdateAuthoritiesApp.class);
     @Autowired
     private UpdateAuthoritiesService service;
 
@@ -22,12 +21,12 @@ public class FolioUpdateAuthoritiesApp implements CommandLineRunner {
     }
 
     public static void exitWithError(String errorMessage) {
-        LOG.error(errorMessage);
+        log.error(errorMessage);
         System.exit(0);
     }
 
     public static void exitWithMessage(String message) {
-        LOG.info(message);
+        log.info(message);
         System.exit(0);
     }
 

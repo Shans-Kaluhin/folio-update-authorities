@@ -1,12 +1,11 @@
 package org.folio.service;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarStyle;
 import org.folio.client.DataImportClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +15,9 @@ import static org.folio.model.enums.JobStatus.COMMITTED;
 import static org.folio.model.enums.JobStatus.DISCARDED;
 import static org.folio.model.enums.JobStatus.ERROR;
 
+@Slf4j
 public class DataImportService {
-    private static final Logger LOG = LoggerFactory.getLogger(DataImportService.class);
+    private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : Update Authorities";
     private final DataImportClient dataImportClient;
 
     public DataImportService(DataImportClient dataImportClient) {
@@ -27,7 +27,7 @@ public class DataImportService {
     @SneakyThrows
     public void updateAuthority(Path authorityMrcFile, int recordsAmount) {
         var uploadDefinition = dataImportClient.uploadDefinition(authorityMrcFile);
-        LOG.info("Update authority job id: " + uploadDefinition.getJobExecutionId());
+        log.info("Update authority job id: " + uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
         dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
@@ -46,7 +46,7 @@ public class DataImportService {
         if (isJobFinished(job.getStatus())) {
             progressBar.close();
         } else {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(20);
             waitForJobFinishing(progressBar, jobId);
         }
     }
@@ -54,7 +54,7 @@ public class DataImportService {
     private ProgressBar buildProgressBar(int recordsAmount) {
         return new ProgressBarBuilder()
                 .setInitialMax(recordsAmount)
-                .setTaskName("IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : Update Authorities")
+                .setTaskName(STATUS_BAR_TITLE)
                 .setStyle(ProgressBarStyle.COLORFUL_UNICODE_BAR)
                 .setMaxRenderedLength(150)
                 .build();

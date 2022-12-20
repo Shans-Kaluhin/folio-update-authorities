@@ -44,8 +44,8 @@ public class FileWorker {
         }
     }
 
-    public static boolean deleteFile(Path path) {
-        return path.toFile().delete();
+    public static void deleteFile(Path path) {
+        path.toFile().delete();
     }
 
     public static InputStream getResourceFile(String name) {
