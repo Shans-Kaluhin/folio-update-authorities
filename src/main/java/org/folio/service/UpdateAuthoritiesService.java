@@ -7,6 +7,8 @@ import org.folio.client.SRSClient;
 import org.folio.model.Configuration;
 import org.folio.util.FileWorker;
 import org.folio.util.HttpWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithMessage;
@@ -14,13 +16,12 @@ import static org.folio.util.FileWorker.deleteFile;
 
 @Service
 public class UpdateAuthoritiesService {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateAuthoritiesService.class);
     private SRSClient srsClient;
-    private DataImportService importService;
-    private MarcConverterService marcConverterService;
-    private JobProfileService jobProfileService;
-
     private Configuration configuration;
-
+    private DataImportService importService;
+    private JobProfileService jobProfileService;
+    private MarcConverterService marcConverterService;
 
     public void start() {
         configuration = FileWorker.getConfiguration();
@@ -42,24 +43,39 @@ public class UpdateAuthoritiesService {
     }
 
     private String updateAuthorities() {
-        jobProfileService.populateProfiles();
-
         var totalRecords = srsClient.retrieveTotalRecords();
+        validateTotalRecords(totalRecords);
+
+        jobProfileService.populateProfiles();
         while (configuration.getOffset() < totalRecords) {
             var records = srsClient.retrieveRecords(configuration.getLimit(), configuration.getOffset());
             incrementOffset(configuration, records.size());
 
             var mrcFile = marcConverterService.writeRecords(records);
-            importService.updateAuthority(mrcFile);
+            importService.updateAuthority(mrcFile, records.size());
             deleteFile(mrcFile);
         }
+        jobProfileService.deleteProfiles();
 
-       // jobProfileService.deleteProfiles();
         return "Authorities was updated";
     }
 
     private void incrementOffset(Configuration configuration, int offset) {
         configuration.incrementOffset(offset);
         FileWorker.updateConfiguration(configuration);
+    }
+
+    private void validateTotalRecords(int totalRecords) {
+        LOG.info("Total authority records: {}", totalRecords);
+
+        if (totalRecords < 1) {
+            exitWithMessage("There is no authorities to update");
+        }
+
+        if (configuration.getOffset() >= totalRecords) {
+            LOG.warn("Offset is bigger then total records");
+            configuration.refreshOffset();
+            LOG.warn("Offset updated to 0");
+        }
     }
 }

@@ -46,6 +46,14 @@ public class HttpWorker {
                 .build();
     }
 
+    @SneakyThrows
+    public HttpRequest constructPUTRequest(String uri, String body) {
+        return constructRequest(uri)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+    }
+
     public HttpRequest.Builder constructRequest(String uri) {
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(configuration.getOkapiUrl() + uri))

@@ -9,9 +9,11 @@ import org.marc4j.MarcStreamWriter;
 import org.marc4j.MarcWriter;
 import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
+import org.marc4j.marc.Leader;
 import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.VariableField;
+import org.marc4j.marc.impl.LeaderImpl;
 import org.marc4j.marc.impl.SortedMarcFactoryImpl;
 
 import java.io.ByteArrayOutputStream;
@@ -29,7 +31,7 @@ public class MarcRecordWriter extends AbstractRecordWriter {
     public MarcRecordWriter(String leader) {
         this.encoding = StandardCharsets.UTF_8.name();
         this.factory = new SortedMarcFactoryImpl();
-        this.record = this.factory.newRecord(leader);
+        this.record = this.factory.newRecord(new LeaderImpl("00000nzm a2200000 a 4500"));
     }
 
     public void writeLeader(Translation translation) {

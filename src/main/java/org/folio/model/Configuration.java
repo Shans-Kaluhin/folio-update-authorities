@@ -18,4 +18,8 @@ public class Configuration {
     public void incrementOffset(int increment) {
         offset += increment;
     }
+
+    public void refreshOffset() {
+        offset = 0;
+    }
 }

@@ -1,6 +1,9 @@
 package org.folio.service;
 
 import lombok.SneakyThrows;
+import me.tongfei.progressbar.ProgressBar;
+import me.tongfei.progressbar.ProgressBarBuilder;
+import me.tongfei.progressbar.ProgressBarStyle;
 import org.folio.client.DataImportClient;
 import org.folio.model.enums.JobStatus;
 import org.slf4j.Logger;
@@ -11,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.folio.model.enums.JobStatus.CANCELLED;
 import static org.folio.model.enums.JobStatus.COMMITTED;
+import static org.folio.model.enums.JobStatus.DISCARDED;
 import static org.folio.model.enums.JobStatus.ERROR;
 
 public class DataImportService {
@@ -22,26 +26,37 @@ public class DataImportService {
     }
 
     @SneakyThrows
-    public String updateAuthority(Path authorityMrcFile) {
+    public String updateAuthority(Path authorityMrcFile, int recordsAmount) {
         var uploadDefinition = dataImportClient.uploadDefinition(authorityMrcFile);
         LOG.info("Update authority job id: " + uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
         dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
-        waitStatus(uploadDefinition.getJobExecutionId(), COMMITTED);
+
+        waitStatus(buildProgressBar(recordsAmount), uploadDefinition.getJobExecutionId(), COMMITTED);
 
         return uploadDefinition.getJobExecutionId();
     }
 
     @SneakyThrows
-    private String waitStatus(String jobId, JobStatus expectedStatus) {
+    private String waitStatus(ProgressBar progressBar, String jobId, JobStatus expectedStatus) {
         var status = dataImportClient.retrieveJobStatus(jobId);
-        LOG.info("Import job status: " + status);
-        if (status.equals(expectedStatus.name()) || status.equals(ERROR.name()) || status.equals(CANCELLED.name())) {
+        progressBar.step();
+        if (status.equals(expectedStatus.name()) || status.equals(ERROR.name()) || status.equals(CANCELLED.name()) || status.equals(DISCARDED.name())) {
+            LOG.info("Job finished with status: {}", status);
+            progressBar.close();
             return status;
         } else {
             TimeUnit.SECONDS.sleep(20);
-            return waitStatus(jobId, expectedStatus);
+            return waitStatus(progressBar, jobId, expectedStatus);
         }
+    }
+
+    private ProgressBar buildProgressBar(int recordsAmount) {
+        return new ProgressBarBuilder()
+                .setInitialMax(recordsAmount)
+                .setTaskName("Update authorities")
+                .setStyle(ProgressBarStyle.COLORFUL_UNICODE_BAR)
+                .build();
     }
 }
