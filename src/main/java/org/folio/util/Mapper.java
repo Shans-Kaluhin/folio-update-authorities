@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import lombok.SneakyThrows;
+import org.folio.model.JobExecution;
 import org.folio.model.MarcField;
 import org.folio.model.ParsedRecord;
 import org.folio.model.UploadDefinition;
+import org.folio.model.enums.JobStatus;
 import org.folio.processor.rule.DataSource;
 import org.folio.reader.values.CompositeValue;
 import org.folio.reader.values.StringValue;
@@ -124,6 +126,26 @@ public class Mapper {
         }
 
         return new MarcField(field, ind1, ind2, subfields);
+    }
+
+    @SneakyThrows
+    public static JobExecution mapToJobExecution(String json, String jobId) {
+        var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
+
+        for (var job : jobs) {
+            var id = job.get("id").asText();
+
+            if (jobId.equals(id)) {
+                var progress = job.get("progress");
+                var status = job.get("status").asText();
+                var uiStatus = job.get("uiStatus").asText();
+                var current = progress.get("current").asInt();
+                var total = progress.get("total").asInt();
+
+                return new JobExecution(status, uiStatus, current, total);
+            }
+        }
+        return new JobExecution(JobStatus.ERROR.name(), "JOB_NOT_FOUND", 0, 0);
     }
 
     @SneakyThrows

@@ -38,7 +38,6 @@ public class FolioUpdateAuthoritiesApp implements CommandLineRunner {
         }
 
         FileWorker.configurationFile = new File(args[0]);
-
         service.start();
     }
 }

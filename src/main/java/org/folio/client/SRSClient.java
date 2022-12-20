@@ -19,8 +19,8 @@ public class SRSClient {
         this.httpWorker = httpWorker;
     }
 
-    public List<ParsedRecord> retrieveRecords(int limit, int offset) {
-        LOG.info("Retrieving records from {} to {}", offset, offset + limit);
+    public List<ParsedRecord> retrieveRecords(int limit, int offset, int total) {
+        LOG.info("Retrieving records from {} to {}", offset, total);
         String uri = String.format(GET_RECORDS_PATH, limit, offset);
 
         var request = httpWorker.constructGETRequest(uri);

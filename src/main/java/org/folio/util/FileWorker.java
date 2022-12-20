@@ -26,7 +26,7 @@ public class FileWorker {
         return getMappedFile(configurationFile, Configuration.class);
     }
 
-    public static void updateConfiguration(Configuration configuration) {
+    public static void saveConfiguration(Configuration configuration) {
         try (FileWriter fileWriter = new FileWriter(configurationFile)) {
             var objectWriter = OBJECT_MAPPER.writer().withDefaultPrettyPrinter();
             fileWriter.write(objectWriter.writeValueAsString(configuration));

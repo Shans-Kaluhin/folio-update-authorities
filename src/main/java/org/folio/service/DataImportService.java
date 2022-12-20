@@ -5,7 +5,6 @@ import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarStyle;
 import org.folio.client.DataImportClient;
-import org.folio.model.enums.JobStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,37 +25,45 @@ public class DataImportService {
     }
 
     @SneakyThrows
-    public String updateAuthority(Path authorityMrcFile, int recordsAmount) {
+    public void updateAuthority(Path authorityMrcFile, int recordsAmount) {
         var uploadDefinition = dataImportClient.uploadDefinition(authorityMrcFile);
         LOG.info("Update authority job id: " + uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
         dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
 
-        waitStatus(buildProgressBar(recordsAmount), uploadDefinition.getJobExecutionId(), COMMITTED);
-
-        return uploadDefinition.getJobExecutionId();
+        waitForJobFinishing(buildProgressBar(recordsAmount), uploadDefinition.getJobExecutionId());
     }
 
     @SneakyThrows
-    private String waitStatus(ProgressBar progressBar, String jobId, JobStatus expectedStatus) {
-        var status = dataImportClient.retrieveJobStatus(jobId);
-        progressBar.step();
-        if (status.equals(expectedStatus.name()) || status.equals(ERROR.name()) || status.equals(CANCELLED.name()) || status.equals(DISCARDED.name())) {
-            LOG.info("Job finished with status: {}", status);
+    private void waitForJobFinishing(ProgressBar progressBar, String jobId) {
+        var job = dataImportClient.retrieveJobExecution(jobId);
+
+        progressBar.setExtraMessage(job.getUiStatus());
+        progressBar.maxHint(job.getTotal());
+        progressBar.stepTo(job.getCurrent());
+
+        if (isJobFinished(job.getStatus())) {
             progressBar.close();
-            return status;
         } else {
-            TimeUnit.SECONDS.sleep(20);
-            return waitStatus(progressBar, jobId, expectedStatus);
+            TimeUnit.SECONDS.sleep(5);
+            waitForJobFinishing(progressBar, jobId);
         }
     }
 
     private ProgressBar buildProgressBar(int recordsAmount) {
         return new ProgressBarBuilder()
                 .setInitialMax(recordsAmount)
-                .setTaskName("Update authorities")
+                .setTaskName("IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : Update Authorities")
                 .setStyle(ProgressBarStyle.COLORFUL_UNICODE_BAR)
+                .setMaxRenderedLength(150)
                 .build();
+    }
+
+    private boolean isJobFinished(String status) {
+        return COMMITTED.name().equals(status)
+                || ERROR.name().equals(status)
+                || CANCELLED.name().equals(status)
+                || DISCARDED.name().equals(status);
     }
 }

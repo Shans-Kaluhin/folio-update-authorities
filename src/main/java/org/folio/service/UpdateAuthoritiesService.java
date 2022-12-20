@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithMessage;
 import static org.folio.util.FileWorker.deleteFile;
+import static org.folio.util.FileWorker.saveConfiguration;
 
 @Service
 public class UpdateAuthoritiesService {
@@ -48,8 +49,9 @@ public class UpdateAuthoritiesService {
 
         jobProfileService.populateProfiles();
         while (configuration.getOffset() < totalRecords) {
-            var records = srsClient.retrieveRecords(configuration.getLimit(), configuration.getOffset());
-            incrementOffset(configuration, records.size());
+            var records = srsClient.retrieveRecords(configuration.getLimit(), configuration.getOffset(), totalRecords);
+            configuration.incrementOffset(records.size());
+            saveConfiguration(configuration);
 
             var mrcFile = marcConverterService.writeRecords(records);
             importService.updateAuthority(mrcFile, records.size());
@@ -60,11 +62,6 @@ public class UpdateAuthoritiesService {
         return "Authorities was updated";
     }
 
-    private void incrementOffset(Configuration configuration, int offset) {
-        configuration.incrementOffset(offset);
-        FileWorker.updateConfiguration(configuration);
-    }
-
     private void validateTotalRecords(int totalRecords) {
         LOG.info("Total authority records: {}", totalRecords);
 
@@ -72,10 +69,15 @@ public class UpdateAuthoritiesService {
             exitWithMessage("There is no authorities to update");
         }
 
+        if (configuration.getOffset() > 0) {
+            LOG.warn("Found the offset value. Update will start from {}", configuration.getOffset());
+        }
+
         if (configuration.getOffset() >= totalRecords) {
             LOG.warn("Offset is bigger then total records");
             configuration.refreshOffset();
-            LOG.warn("Offset updated to 0");
+            saveConfiguration(configuration);
+            LOG.warn("Offset reset to 0");
         }
     }
 }

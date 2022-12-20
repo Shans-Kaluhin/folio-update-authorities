@@ -24,9 +24,9 @@ public class JobProfileService {
 
     public void deleteProfiles() {
         LOG.info("Deleting default job profiles...");
-        client.deleteJobProfile(JobProfile.MAPPING_PROFILE);
         client.deleteJobProfile(JobProfile.JOB_PROFILE);
         client.deleteJobProfile(JobProfile.MATCH_PROFILE);
         client.deleteJobProfile(JobProfile.ACTION_PROFILE);
+        client.deleteJobProfile(JobProfile.MAPPING_PROFILE);
     }
 }

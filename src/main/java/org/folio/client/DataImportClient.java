@@ -1,14 +1,16 @@
 package org.folio.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.SneakyThrows;
+import org.folio.model.JobExecution;
 import org.folio.model.UploadDefinition;
 import org.folio.util.HttpWorker;
 
 import java.nio.file.Path;
 
+import static org.folio.model.enums.JobProfile.JOB_PROFILE;
 import static org.folio.util.FileWorker.getJsonObject;
 import static org.folio.util.Mapper.mapResponseToJson;
+import static org.folio.util.Mapper.mapToJobExecution;
 import static org.folio.util.Mapper.mapUploadDefinition;
 
 public class DataImportClient {
@@ -17,7 +19,7 @@ public class DataImportClient {
     private static final String UPLOAD_DEFINITION_BY_ID_PATH = "/data-import/uploadDefinitions/%s";
     private static final String UPLOAD_FILE_PATH = UPLOAD_DEFINITION_PATH + "/%s/files/%s";
     private static final String UPLOAD_JOB_PROFILE_PATH = UPLOAD_DEFINITION_PATH + "/%s/processFiles?defaultMapping=false";
-    private static final String JOB_EXECUTION_PATH = "/change-manager/jobExecutions/%s";
+    private static final String JOB_EXECUTION_PATH = "/metadata-provider/jobExecutions?profileIdAny=%s&sortBy=completed_date,desc";
 
     private final HttpWorker httpWorker;
 
@@ -25,7 +27,6 @@ public class DataImportClient {
         this.httpWorker = httpWorker;
     }
 
-    @SneakyThrows
     public UploadDefinition uploadDefinition(Path filePath) {
         String body = String.format(UPLOAD_DEFINITION_BODY, filePath.getFileName());
 
@@ -37,7 +38,6 @@ public class DataImportClient {
         return mapUploadDefinition(response.body(), filePath);
     }
 
-    @SneakyThrows
     public JsonNode retrieveUploadDefinition(String uploadDefinitionId) {
         var uri = String.format(UPLOAD_DEFINITION_BY_ID_PATH, uploadDefinitionId);
 
@@ -49,7 +49,6 @@ public class DataImportClient {
         return mapResponseToJson(response);
     }
 
-    @SneakyThrows
     public void uploadFile(UploadDefinition uploadDefinition) {
         var uploadPath = String.format(UPLOAD_FILE_PATH, uploadDefinition.getUploadDefinitionId(), uploadDefinition.getFileId());
 
@@ -71,15 +70,14 @@ public class DataImportClient {
         httpWorker.verifyStatus(response, 204, "Failed to upload job profile");
     }
 
-    @SneakyThrows
-    public String retrieveJobStatus(String jobId) {
-        var getJobStatusPath = String.format(JOB_EXECUTION_PATH, jobId);
+    public JobExecution retrieveJobExecution(String jobId) {
+        var getJobStatusPath = String.format(JOB_EXECUTION_PATH, JOB_PROFILE.getId());
 
         var request = httpWorker.constructGETRequest(getJobStatusPath);
         var response = httpWorker.sendRequest(request);
 
         httpWorker.verifyStatus(response, 200, "Failed to fetching jo status");
 
-        return mapResponseToJson(response).findValue("status").asText();
+        return mapToJobExecution(response.body(), jobId);
     }
 }
