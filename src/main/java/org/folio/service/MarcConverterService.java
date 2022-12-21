@@ -19,13 +19,10 @@ public class MarcConverterService {
     private static final String FILE_NAME = "Release Upgrade - Migrate MARC authority records.mrc";
 
     public Path writeRecords(List<ParsedRecord> records) {
-        log.info("Generating mrc file...");
-
-        var mrcFile = records.stream()
+        log.info("Generating authorities mrc file...");
+        return writeFile(FILE_NAME, records.stream()
                 .map(this::convertRecord)
-                .toList();
-
-        return writeFile(FILE_NAME, mrcFile);
+                .toList());
     }
 
     private String convertRecord(ParsedRecord parsedRecord) {
@@ -37,7 +34,6 @@ public class MarcConverterService {
                 recordWriter.writeField(marcField.getTag(), mapToCompositeValue(marcField));
             }
         });
-
         return recordWriter.getResult();
     }
 }

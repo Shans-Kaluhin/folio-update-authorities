@@ -59,8 +59,9 @@ public class HttpWorker {
                 .uri(URI.create(configuration.getOkapiUrl() + uri))
                 .header("x-okapi-tenant", configuration.getTenant());
 
-        if (okapiToken != null) builder.header("x-okapi-token", okapiToken);
-
+        if (okapiToken != null) {
+            builder.header("x-okapi-token", okapiToken);
+        }
         return builder;
     }
 

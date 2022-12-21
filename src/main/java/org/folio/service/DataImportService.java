@@ -38,10 +38,9 @@ public class DataImportService {
     @SneakyThrows
     private void waitForJobFinishing(ProgressBar progressBar, String jobId) {
         var job = dataImportClient.retrieveJobExecution(jobId);
-
-        progressBar.setExtraMessage(job.getUiStatus());
         progressBar.maxHint(job.getTotal());
         progressBar.stepTo(job.getCurrent());
+        progressBar.setExtraMessage(job.getUiStatus());
 
         if (isJobFinished(job.getStatus())) {
             progressBar.close();
@@ -55,8 +54,8 @@ public class DataImportService {
         return new ProgressBarBuilder()
                 .setInitialMax(recordsAmount)
                 .setTaskName(STATUS_BAR_TITLE)
-                .setStyle(ProgressBarStyle.COLORFUL_UNICODE_BAR)
-                .setMaxRenderedLength(150)
+                .setStyle(ProgressBarStyle.ASCII)
+                .setMaxRenderedLength(STATUS_BAR_TITLE.length() + 70)
                 .build();
     }
 
