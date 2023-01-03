@@ -58,7 +58,7 @@ public class UpdateAuthoritiesService {
         }
         jobProfileService.deleteProfiles();
 
-        return "Authorities was updated";
+        return "Script execution completed";
     }
 
     private void validateTotalRecords(int totalRecords) {

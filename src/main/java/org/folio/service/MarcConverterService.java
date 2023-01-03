@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import static org.folio.mapper.MarcMapper.mapToCompositeValue;
 import static org.folio.mapper.MarcMapper.mapToStringValue;
@@ -21,6 +22,7 @@ public class MarcConverterService {
     public Path writeRecords(List<ParsedRecord> records) {
         log.info("Generating authorities mrc file...");
         return writeFile(FILE_NAME, records.stream()
+                .filter(Objects::nonNull)
                 .map(this::convertRecord)
                 .toList());
     }

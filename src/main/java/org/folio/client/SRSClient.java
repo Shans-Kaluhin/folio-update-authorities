@@ -11,7 +11,8 @@ import static org.folio.mapper.ResponseMapper.mapToParsedRecords;
 
 @Slf4j
 public class SRSClient {
-    private static final String GET_RECORDS_PATH = "/source-storage/records?recordType=MARC_AUTHORITY&state=ACTUAL&limit=%s&offset=%s";
+    private static final String PARAMS = "?recordType=MARC_AUTHORITY&state=ACTUAL&orderBy=matched_id,ASC&limit=%s&offset=%s";
+    private static final String GET_RECORDS_PATH = "/source-storage/records" + PARAMS;
     private final HttpWorker httpWorker;
 
     public SRSClient(HttpWorker httpWorker) {
@@ -19,7 +20,8 @@ public class SRSClient {
     }
 
     public List<ParsedRecord> retrieveRecords(int limit, int offset, int total) {
-        log.info("Retrieving records from {} to {}", offset, total);
+        int retrieveTo = Math.min(total, offset + limit);
+        log.info("Retrieving records from {} to {}", offset, retrieveTo);
         String uri = String.format(GET_RECORDS_PATH, limit, offset);
 
         var request = httpWorker.constructGETRequest(uri);

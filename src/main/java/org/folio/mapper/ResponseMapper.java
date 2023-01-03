@@ -3,6 +3,7 @@ package org.folio.mapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.folio.model.JobExecution;
 import org.folio.model.ParsedRecord;
 import org.folio.model.UploadDefinition;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.folio.mapper.MarcMapper.mapRecordFields;
 
+@Slf4j
 public class ResponseMapper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -70,10 +72,15 @@ public class ResponseMapper {
     }
 
     private static ParsedRecord mapToParsedRecord(JsonNode jsonNode) {
-        var parsedRecord = jsonNode.get("parsedRecord");
-        var content = parsedRecord.get("content");
+        var id = jsonNode.get("id").asText();
 
-        var id = parsedRecord.get("id").asText();
+        var parsedRecord = jsonNode.get("parsedRecord");
+        if (parsedRecord == null) {
+            log.error("Record {} doesn't contains fields to update", id);
+            return null;
+        }
+
+        var content = parsedRecord.get("content");
         var leader = content.get("leader").asText();
         var fields = mapRecordFields(content);
 
