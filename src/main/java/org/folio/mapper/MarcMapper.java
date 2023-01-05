@@ -68,22 +68,21 @@ public class MarcMapper {
         return mappedFields;
     }
 
-    private static MarcField mapToMarcField(String field, JsonNode value) {
-        if (value.getNodeType().equals(JsonNodeType.STRING)) {
-            return new MarcField(field, value.asText());
+    private static MarcField mapToMarcField(String field, JsonNode json) {
+        if (json.getNodeType().equals(JsonNodeType.STRING)) {
+            return new MarcField(field, json.asText());
         }
 
-        var authoritySubfields = value.get("subfields");
-        var ind1 = value.get("ind1").asText();
-        var ind2 = value.get("ind2").asText();
+        var authoritySubfields = json.get("subfields");
+        var ind1 = json.get("ind1").asText();
+        var ind2 = json.get("ind2").asText();
 
         Map<Character, String> subfields = new HashMap<>();
         for (var authoritySubfield : authoritySubfields) {
             authoritySubfield.fields().forEachRemaining(e -> {
                 Character subfield = e.getKey().charAt(0);
-                if (!(subfield.equals('0') || subfield.equals('9'))) {
-                    subfields.put(subfield, e.getValue().asText());
-                }
+                String value = e.getValue().asText();
+                subfields.put(subfield, value);
             });
         }
 

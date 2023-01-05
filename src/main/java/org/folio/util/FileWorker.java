@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class FileWorker {
         File file = new File(name);
         try (FileOutputStream writer = new FileOutputStream(name)) {
             for (var str : strings) {
-                writer.write(str.getBytes(Charset.defaultCharset()));
+                writer.write(str.getBytes(StandardCharsets.UTF_8));
             }
             return file.toPath();
         } catch (IOException e) {

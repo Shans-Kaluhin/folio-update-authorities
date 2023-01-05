@@ -73,10 +73,9 @@ public class UpdateAuthoritiesService {
         }
 
         if (configuration.getOffset() >= totalRecords) {
-            log.warn("Offset is bigger then total records");
+            log.warn("Offset is bigger then total records. Reset it to 0");
             configuration.refreshOffset();
             saveConfiguration(configuration);
-            log.warn("Offset reset to 0");
         }
     }
 }

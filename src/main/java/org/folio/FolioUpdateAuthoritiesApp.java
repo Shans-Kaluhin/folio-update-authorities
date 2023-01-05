@@ -33,7 +33,7 @@ public class FolioUpdateAuthoritiesApp implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (args.length != 1) {
-            exitWithError("Please specify all parameters: configuration .json file path");
+            exitWithError("Please specify all parameters: configuration.json file path");
         }
 
         FileWorker.configurationFile = new File(args[0]);

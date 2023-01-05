@@ -44,7 +44,7 @@ public class ResponseMapper {
                 return new JobExecution(status, uiStatus, current, total);
             }
         }
-        return new JobExecution(JobStatus.ERROR.name(), "JOB_NOT_FOUND", 0, 0);
+        return new JobExecution(JobStatus.NOT_FOUND.name(), "INITIALIZING", 0, 0);
     }
 
     @SneakyThrows
