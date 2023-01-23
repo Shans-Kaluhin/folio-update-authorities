@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.folio.model.ParsedRecord;
 import org.folio.util.HttpWorker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.folio.mapper.ResponseMapper.mapResponseToJson;
@@ -13,10 +14,25 @@ import static org.folio.mapper.ResponseMapper.mapToParsedRecords;
 public class SRSClient {
     private static final String PARAMS = "?recordType=MARC_AUTHORITY&state=ACTUAL&orderBy=matched_id,ASC&limit=%s&offset=%s";
     private static final String GET_RECORDS_PATH = "/source-storage/records" + PARAMS;
+    private static final int SRS_LIMIT = 10000;
     private final HttpWorker httpWorker;
 
     public SRSClient(HttpWorker httpWorker) {
         this.httpWorker = httpWorker;
+    }
+
+    public List<ParsedRecord> retrieveRecordsPartitionaly(int limit, int offset, int total) {
+        if (limit < SRS_LIMIT) {
+            return retrieveRecords(limit, offset, total);
+        }
+
+        var result = new ArrayList<ParsedRecord>();
+        while (result.size() < limit) {
+            var records = retrieveRecords(SRS_LIMIT, offset, total);
+            result.addAll(records);
+            offset += SRS_LIMIT;
+        }
+        return result;
     }
 
     public List<ParsedRecord> retrieveRecords(int limit, int offset, int total) {

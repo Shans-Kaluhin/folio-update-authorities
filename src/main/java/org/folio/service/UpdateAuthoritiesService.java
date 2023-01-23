@@ -48,7 +48,7 @@ public class UpdateAuthoritiesService {
 
         jobProfileService.populateProfiles();
         while (configuration.getOffset() < totalRecords) {
-            var records = srsClient.retrieveRecords(configuration.getLimit(), configuration.getOffset(), totalRecords);
+            var records = srsClient.retrieveRecordsPartitionaly(configuration.getLimit(), configuration.getOffset(), totalRecords);
             configuration.incrementOffset(records.size());
             saveConfiguration(configuration);
 

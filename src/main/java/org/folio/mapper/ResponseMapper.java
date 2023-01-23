@@ -76,7 +76,6 @@ public class ResponseMapper {
 
         var parsedRecord = jsonNode.get("parsedRecord");
         if (parsedRecord == null) {
-            log.error("Record {} doesn't contains fields to update", id);
             return null;
         }
 
