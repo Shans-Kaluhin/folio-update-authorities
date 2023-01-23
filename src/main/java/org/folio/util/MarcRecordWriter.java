@@ -12,7 +12,7 @@ import org.marc4j.marc.DataField;
 import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.VariableField;
-import org.marc4j.marc.impl.SortedMarcFactoryImpl;
+import org.marc4j.marc.impl.MarcFactoryImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -27,15 +27,12 @@ public class MarcRecordWriter extends AbstractRecordWriter {
 
     public MarcRecordWriter(String leader) {
         this.encoding = StandardCharsets.UTF_8.name();
-        this.factory = new SortedMarcFactoryImpl();
+        this.factory = new MarcFactoryImpl();
         this.record = this.factory.newRecord(leader);
     }
 
     public void writeLeader(Translation translation) {
-        if (translation.getFunction().equals("set_17-19_positions")) {
-            char[] implDefined2 = new char[]{translation.getParameter("position17").charAt(0), translation.getParameter("position18").charAt(0), translation.getParameter("position19").charAt(0)};
-            this.record.getLeader().setImplDefined2(implDefined2);
-        }
+        //Use constructor
     }
 
     public void writeControlField(RecordControlField recordControlField) {

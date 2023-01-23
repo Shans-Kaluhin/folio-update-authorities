@@ -8,8 +8,8 @@ import org.folio.processor.rule.DataSource;
 import org.folio.reader.values.CompositeValue;
 import org.folio.reader.values.StringValue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ public class MarcMapper {
 
     public static CompositeValue mapToCompositeValue(MarcField marcField) {
         CompositeValue compositeValue = new CompositeValue();
-        List<StringValue> values = new ArrayList<>();
+        List<StringValue> values = new LinkedList<>();
 
         values.addAll(mapInd(marcField));
         values.addAll(mapSubfields(marcField));
@@ -42,7 +42,7 @@ public class MarcMapper {
     }
 
     public static List<StringValue> mapSubfields(MarcField marcField) {
-        var subfields = new ArrayList<StringValue>();
+        var subfields = new LinkedList<StringValue>();
 
         marcField.getSubfields().forEach((subfield, value) -> {
             var dataSource = new DataSource();
@@ -55,7 +55,7 @@ public class MarcMapper {
     }
 
     public static List<MarcField> mapRecordFields(JsonNode jsonNode) {
-        var mappedFields = new ArrayList<MarcField>();
+        var mappedFields = new LinkedList<MarcField>();
         var fields = (ArrayNode) jsonNode.get("fields");
 
         for (var field : fields) {
@@ -77,7 +77,7 @@ public class MarcMapper {
         var ind1 = json.get("ind1").asText();
         var ind2 = json.get("ind2").asText();
 
-        Map<Character, String> subfields = new HashMap<>();
+        Map<Character, String> subfields = new LinkedHashMap<>();
         for (var authoritySubfield : authoritySubfields) {
             authoritySubfield.fields().forEachRemaining(e -> {
                 Character subfield = e.getKey().charAt(0);
