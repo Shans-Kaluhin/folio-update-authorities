@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.folio.model.Configuration;
 import org.springframework.util.ResourceUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -38,15 +38,15 @@ public class FileWorker {
 
     public static Path writeFile(String name, List<String> strings) {
         File file = new File(name);
-        try (FileOutputStream writer = new FileOutputStream(name)) {
+        try (FileWriter fw = new FileWriter(file, StandardCharsets.UTF_8);
+             BufferedWriter writer = new BufferedWriter(fw)) {
             for (var str : strings) {
-                writer.write(str.getBytes(Charset.defaultCharset()));
+                writer.append(str);
             }
-            return file.toPath();
         } catch (IOException e) {
             exitWithError("Failed to write file: " + name);
-            return null;
         }
+        return file.toPath();
     }
 
     public static boolean deleteFile(Path path) {

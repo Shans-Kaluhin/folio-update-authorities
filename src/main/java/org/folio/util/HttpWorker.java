@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -68,10 +69,10 @@ public class HttpWorker {
     @SneakyThrows
     public HttpResponse<String> sendRequest(HttpRequest request) {
         return HttpClient.newHttpClient()
-                .send(request, HttpResponse.BodyHandlers.ofString());
+                .send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
-    public void verifyStatus(HttpResponse<String> response, int expectedStatus, String errorMessage) {
+    public void verifyStatus(HttpResponse<?> response, int expectedStatus, String errorMessage) {
         if (response.statusCode() != expectedStatus) {
             exitWithError(errorMessage + "\n Response: " + response.body());
         }
