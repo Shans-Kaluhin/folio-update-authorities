@@ -36,7 +36,7 @@ public class DataImportService {
     }
 
     public void checkForExistedJob() {
-        var existedJob = dataImportClient.retrieveInProgressJob();
+        var existedJob = dataImportClient.retrieveFirstInProgressJob();
         if (!NOT_FOUND.name().equals(existedJob.getStatus())) {
             log.info("Discovered not finished data-import job: {}", existedJob.getId());
 

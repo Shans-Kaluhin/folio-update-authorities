@@ -83,7 +83,7 @@ public class DataImportClient {
         return mapToJobExecutionById(response.body(), jobId);
     }
 
-    public JobExecution retrieveInProgressJob() {
+    public JobExecution retrieveFirstInProgressJob() {
         var request = httpWorker.constructGETRequest(ANY_JOB_IN_PROGRESS_PATH);
         var response = httpWorker.sendRequest(request);
 
