@@ -28,23 +28,41 @@ public class ResponseMapper {
     }
 
     @SneakyThrows
-    public static JobExecution mapToJobExecution(String json, String jobId) {
+    public static JobExecution mapToJobExecutionById(String json, String jobId) {
         var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
 
         for (var job : jobs) {
             var id = job.get("id").asText();
-
             if (jobId.equals(id)) {
-                var progress = job.get("progress");
-                var status = job.get("status").asText();
-                var uiStatus = job.get("uiStatus").asText();
-                var current = progress.get("current").asInt();
-                var total = progress.get("total").asInt();
-
-                return new JobExecution(status, uiStatus, current, total);
+                return mapToJobExecution(job);
             }
         }
-        return new JobExecution(JobStatus.NOT_FOUND.name(), "INITIALIZING", 0, 0);
+       return mapToEmptyJobExecution();
+    }
+
+    @SneakyThrows
+    public static JobExecution mapToFirstJobExecution(String json) {
+        var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
+
+        if (jobs.has(0)) {
+            return mapToJobExecution(jobs.get(0));
+        }
+        return mapToEmptyJobExecution();
+    }
+
+    public static JobExecution mapToJobExecution(JsonNode job) {
+            var id = job.get("id").asText();
+            var progress = job.get("progress");
+            var status = job.get("status").asText();
+            var uiStatus = job.get("uiStatus").asText();
+            var current = progress.get("current").asInt();
+            var total = progress.get("total").asInt();
+
+            return new JobExecution(id, status, uiStatus, current, total);
+    }
+
+    public static JobExecution mapToEmptyJobExecution() {
+        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING", 0, 0);
     }
 
     @SneakyThrows
@@ -61,9 +79,9 @@ public class ResponseMapper {
 
     @SneakyThrows
     public static List<ParsedRecord> mapToParsedRecords(String json) {
-        var records = new ArrayList<ParsedRecord>();
         var jsonRecords = OBJECT_MAPPER.readTree(json).get("records");
 
+        var records = new ArrayList<ParsedRecord>();
         for (JsonNode record : jsonRecords) {
             records.add(mapToParsedRecord(record));
         }

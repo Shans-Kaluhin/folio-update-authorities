@@ -8,7 +8,8 @@ import org.folio.util.HttpWorker;
 import java.nio.file.Path;
 
 import static org.folio.mapper.ResponseMapper.mapResponseToJson;
-import static org.folio.mapper.ResponseMapper.mapToJobExecution;
+import static org.folio.mapper.ResponseMapper.mapToFirstJobExecution;
+import static org.folio.mapper.ResponseMapper.mapToJobExecutionById;
 import static org.folio.mapper.ResponseMapper.mapUploadDefinition;
 import static org.folio.model.enums.JobProfile.JOB_PROFILE;
 import static org.folio.util.FileWorker.getJsonObject;
@@ -20,6 +21,7 @@ public class DataImportClient {
     private static final String UPLOAD_FILE_PATH = UPLOAD_DEFINITION_PATH + "/%s/files/%s";
     private static final String UPLOAD_JOB_PROFILE_PATH = UPLOAD_DEFINITION_PATH + "/%s/processFiles?defaultMapping=false";
     private static final String JOB_EXECUTION_PATH = "/metadata-provider/jobExecutions?profileIdAny=%s&sortBy=completed_date,desc";
+    private static final String ANY_JOB_IN_PROGRESS_PATH = "/metadata-provider/jobExecutions?statusAny=PARSING_IN_PROGRESS&sortBy=completed_date,desc";
 
     private final HttpWorker httpWorker;
 
@@ -78,6 +80,15 @@ public class DataImportClient {
 
         httpWorker.verifyStatus(response, 200, "Failed to fetching jo status");
 
-        return mapToJobExecution(response.body(), jobId);
+        return mapToJobExecutionById(response.body(), jobId);
+    }
+
+    public JobExecution retrieveInProgressJob() {
+        var request = httpWorker.constructGETRequest(ANY_JOB_IN_PROGRESS_PATH);
+        var response = httpWorker.sendRequest(request);
+
+        httpWorker.verifyStatus(response, 200, "Failed to fetching jo status");
+
+        return mapToFirstJobExecution(response.body());
     }
 }

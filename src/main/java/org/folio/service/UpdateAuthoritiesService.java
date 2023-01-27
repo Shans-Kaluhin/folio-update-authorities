@@ -38,11 +38,13 @@ public class UpdateAuthoritiesService {
 
         httpWorker.setOkapiToken(authClient.authorize());
 
-        var resultMessage = updateAuthorities();
-        exitWithMessage(resultMessage);
+        importService.checkForExistedJob();
+        updateAuthorities();
+
+        exitWithMessage("Script execution completed");
     }
 
-    private String updateAuthorities() {
+    private void updateAuthorities() {
         var totalRecords = srsClient.retrieveTotalRecords();
         validateTotalRecords(totalRecords);
 
@@ -57,8 +59,6 @@ public class UpdateAuthoritiesService {
             deleteFile(mrcFile);
         }
         jobProfileService.deleteProfiles();
-
-        return "Script execution completed";
     }
 
     private void validateTotalRecords(int totalRecords) {

@@ -74,7 +74,7 @@ public class HttpWorker {
 
     public void verifyStatus(HttpResponse<?> response, int expectedStatus, String errorMessage) {
         if (response.statusCode() != expectedStatus) {
-            exitWithError(errorMessage + "\n Response: " + response.body());
+            exitWithError(errorMessage + " Response: " + response.body());
         }
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class JobExecution {
+    private String id;
     private String status;
     private String uiStatus;
     private int current;

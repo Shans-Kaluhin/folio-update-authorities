@@ -14,25 +14,35 @@ import static org.folio.model.enums.JobStatus.CANCELLED;
 import static org.folio.model.enums.JobStatus.COMMITTED;
 import static org.folio.model.enums.JobStatus.DISCARDED;
 import static org.folio.model.enums.JobStatus.ERROR;
+import static org.folio.model.enums.JobStatus.NOT_FOUND;
 
 @Slf4j
 public class DataImportService {
-    private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : Update Authorities";
+    private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : ";
     private final DataImportClient dataImportClient;
 
     public DataImportService(DataImportClient dataImportClient) {
         this.dataImportClient = dataImportClient;
     }
 
-    @SneakyThrows
     public void updateAuthority(Path authorityMrcFile, int recordsAmount) {
         var uploadDefinition = dataImportClient.uploadDefinition(authorityMrcFile);
-        log.info("Update authority job id: " + uploadDefinition.getJobExecutionId());
+        log.info("Update authority job id: {}", uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
         dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
 
-        waitForJobFinishing(buildProgressBar(recordsAmount), uploadDefinition.getJobExecutionId());
+        waitForJobFinishing(buildProgressBar("Update Authorities", recordsAmount), uploadDefinition.getJobExecutionId());
+    }
+
+    public void checkForExistedJob() {
+        var existedJob = dataImportClient.retrieveInProgressJob();
+        if (!NOT_FOUND.name().equals(existedJob.getStatus())) {
+            log.info("Discovered not finished data-import job: {}", existedJob.getId());
+
+            waitForJobFinishing(buildProgressBar("Discovered job", existedJob.getTotal()), existedJob.getId());
+            checkForExistedJob();
+        }
     }
 
     @SneakyThrows
@@ -50,10 +60,10 @@ public class DataImportService {
         }
     }
 
-    private ProgressBar buildProgressBar(int recordsAmount) {
+    private ProgressBar buildProgressBar(String title, int recordsAmount) {
         return new ProgressBarBuilder()
                 .setInitialMax(recordsAmount)
-                .setTaskName(STATUS_BAR_TITLE)
+                .setTaskName(STATUS_BAR_TITLE + title)
                 .setStyle(ProgressBarStyle.ASCII)
                 .setMaxRenderedLength(STATUS_BAR_TITLE.length() + 70)
                 .build();

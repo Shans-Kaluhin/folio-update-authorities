@@ -37,13 +37,13 @@ public class SRSClient {
 
     public List<ParsedRecord> retrieveRecords(int limit, int offset, int total) {
         int retrieveTo = Math.min(total, offset + limit);
-        log.info("Retrieving records from {} to {}", offset, retrieveTo);
+        log.info("Retrieving srs records from {} to {}...", offset, retrieveTo);
         String uri = String.format(GET_RECORDS_PATH, limit, offset);
 
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to get records");
+        httpWorker.verifyStatus(response, 200, "Failed to get srs records");
 
         return mapToParsedRecords(response.body());
     }
@@ -54,7 +54,7 @@ public class SRSClient {
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to get total records");
+        httpWorker.verifyStatus(response, 200, "Failed to get srs total records");
 
         return mapResponseToJson(response).findValue("totalRecords").asInt();
     }
