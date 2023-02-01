@@ -20,12 +20,20 @@ public class JobProfilesClient {
 
         var request = httpWorker.constructPOSTRequest(url, profile.toString());
         var response = httpWorker.sendRequest(request);
-        if (response.statusCode() != 201) {
+        if (response.statusCode() == 422) {
+            deleteRelationsJobProfile(jobProfile, profile);
             activateJobProfile(jobProfile, profile);
         }
     }
 
-    public void activateJobProfile(JobProfile jobProfile, ObjectNode profile) {
+    public void deleteJobProfile(JobProfile jobProfile) {
+        var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl() + '/' + jobProfile.getId();
+
+        var request = httpWorker.constructDELETERequest(url);
+        httpWorker.sendRequest(request);
+    }
+
+    private void activateJobProfile(JobProfile jobProfile, ObjectNode profile) {
         var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl() + '/' + jobProfile.getId();
         ((ObjectNode) profile.get("profile")).put("deleted", false);
 
@@ -35,12 +43,16 @@ public class JobProfilesClient {
         httpWorker.verifyStatus(response, 200, "Failed to activate " + jobProfile);
     }
 
-    public void deleteJobProfile(JobProfile jobProfile) {
+    private void deleteRelationsJobProfile(JobProfile jobProfile, ObjectNode profile) {
         var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl() + '/' + jobProfile.getId();
 
-        var request = httpWorker.constructDELETERequest(url);
+        var requestBody = profile.deepCopy();
+        var existRelations = requestBody.remove("addedRelations");
+        requestBody.put("deletedRelations", existRelations);
+
+        var request = httpWorker.constructPUTRequest(url, requestBody.toString());
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 204, "Failed to delete " + jobProfile);
+        httpWorker.verifyStatus(response, 200, "Failed to remove relations " + jobProfile);
     }
 }
