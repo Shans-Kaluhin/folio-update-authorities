@@ -27,7 +27,7 @@ public class SRSClient {
         }
 
         var result = new ArrayList<ParsedRecord>();
-        while (result.size() < limit || total != offset) {
+        while (result.size() < limit && offset < total) {
             var records = retrieveRecords(SRS_LIMIT, offset, total);
             result.addAll(records);
             offset += records.size();

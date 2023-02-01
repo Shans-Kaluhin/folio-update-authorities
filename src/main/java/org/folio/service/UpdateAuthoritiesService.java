@@ -51,6 +51,11 @@ public class UpdateAuthoritiesService {
         jobProfileService.populateProfiles();
         while (configuration.getOffset() < totalRecords) {
             var records = srsClient.retrieveRecordsPartitionaly(configuration.getLimit(), configuration.getOffset(), totalRecords);
+
+            if (records.isEmpty()) {
+                log.info("There is no srs records to update left");
+                break;
+            }
             configuration.incrementOffset(records.size());
             saveConfiguration(configuration);
 
