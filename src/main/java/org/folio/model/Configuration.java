@@ -3,7 +3,9 @@ package org.folio.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,7 +14,8 @@ public class Configuration {
     private String tenant;
     private String username;
     private String password;
-    private int limit;
+    private int importLimit;
+    private int srsLimit;
     private int offset;
 
     public void incrementOffset(int increment) {

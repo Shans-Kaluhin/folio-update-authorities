@@ -1,6 +1,7 @@
 package org.folio.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.folio.model.Configuration;
 import org.folio.model.ParsedRecord;
 import org.folio.util.HttpWorker;
 
@@ -14,21 +15,18 @@ import static org.folio.mapper.ResponseMapper.mapToParsedRecords;
 public class SRSClient {
     private static final String PARAMS = "?recordType=MARC_AUTHORITY&state=ACTUAL&orderBy=matched_id,ASC&limit=%s&offset=%s";
     private static final String GET_RECORDS_PATH = "/source-storage/records" + PARAMS;
-    private static final int SRS_LIMIT = 10000;
     private final HttpWorker httpWorker;
 
     public SRSClient(HttpWorker httpWorker) {
         this.httpWorker = httpWorker;
     }
 
-    public List<ParsedRecord> retrieveRecordsPartitionaly(int limit, int offset, int total) {
-        if (limit < SRS_LIMIT) {
-            return retrieveRecords(limit, offset, total);
-        }
-
+    public List<ParsedRecord> retrieveRecordsPartitionaly(Configuration configuration, int total) {
         var result = new ArrayList<ParsedRecord>();
-        while (result.size() < limit && offset < total) {
-            var records = retrieveRecords(SRS_LIMIT, offset, total);
+        var offset = configuration.getOffset();
+
+        while (result.size() < configuration.getImportLimit() && offset < total) {
+            var records = retrieveRecords(configuration.getSrsLimit(), offset, total);
             result.addAll(records);
             offset += records.size();
         }

@@ -46,11 +46,11 @@ public class UpdateAuthoritiesService {
 
     private void updateAuthorities() {
         var totalRecords = srsClient.retrieveTotalRecords();
-        validateTotalRecords(totalRecords);
+        validateConfiguration(totalRecords);
 
         jobProfileService.populateProfiles();
         while (configuration.getOffset() < totalRecords) {
-            var records = srsClient.retrieveRecordsPartitionaly(configuration.getLimit(), configuration.getOffset(), totalRecords);
+            var records = srsClient.retrieveRecordsPartitionaly(configuration, totalRecords);
 
             if (records.isEmpty()) {
                 log.info("There is no srs records to update left");
@@ -66,7 +66,7 @@ public class UpdateAuthoritiesService {
         jobProfileService.deleteProfiles();
     }
 
-    private void validateTotalRecords(int totalRecords) {
+    private void validateConfiguration(int totalRecords) {
         log.info("Total authority records: {}", totalRecords);
 
         if (totalRecords < 1) {
@@ -75,6 +75,11 @@ public class UpdateAuthoritiesService {
 
         if (configuration.getOffset() > 0) {
             log.warn("Found the offset value. Update will start from {}", configuration.getOffset());
+        }
+
+        if (configuration.getSrsLimit() > configuration.getImportLimit()) {
+            log.warn("SRS limit is bigger then import. It will be reduced it to import limit");
+            configuration.setSrsLimit(configuration.getImportLimit());
         }
 
         if (configuration.getOffset() >= totalRecords) {
