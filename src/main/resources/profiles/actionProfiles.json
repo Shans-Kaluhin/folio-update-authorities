@@ -7,9 +7,9 @@
     "action": "UPDATE",
     "folioRecord": "MARC_AUTHORITY",
     "deleted": false,
+    "hidden": true,
     "parentProfiles": [],
-    "childProfiles": [],
-    "hidden": true
+    "childProfiles": []
   },
   "addedRelations": [
     {

@@ -6,6 +6,10 @@
     "description": "",
     "incomingRecordType": "MARC_AUTHORITY",
     "existingRecordType": "MARC_AUTHORITY",
+    "deleted": false,
+    "hidden": true,
+    "parentProfiles": [],
+    "childProfiles": [],
     "matchDetails": [
       {
         "incomingRecordType": "MARC_AUTHORITY",
@@ -55,11 +59,7 @@
           ]
         }
       }
-    ],
-    "deleted": false,
-    "parentProfiles": [],
-    "childProfiles": [],
-    "hidden": true
+    ]
   },
   "addedRelations": [],
   "deletedRelations": []

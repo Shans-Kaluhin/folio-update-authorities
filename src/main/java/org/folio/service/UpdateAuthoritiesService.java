@@ -77,15 +77,24 @@ public class UpdateAuthoritiesService {
             log.warn("Found the offset value. Update will start from {}", configuration.getOffset());
         }
 
+        if (configuration.getImportLimit() < 1) {
+            exitWithMessage("Import job limit is 0. Please specify the 'importLimit' field");
+        }
+
+        if (configuration.getSrsLimit() < 1) {
+            log.warn("SRS limit is 0. Set it to 5000");
+            configuration.setSrsLimit(5000);
+        }
+
         if (configuration.getSrsLimit() > configuration.getImportLimit()) {
-            log.warn("SRS limit is bigger then import. It will be reduced it to import limit");
+            log.warn("SRS limit is bigger then import. It will be reduced to import limit");
             configuration.setSrsLimit(configuration.getImportLimit());
         }
 
         if (configuration.getOffset() >= totalRecords) {
             log.warn("Offset is bigger then total records. Reset it to 0");
             configuration.refreshOffset();
-            saveConfiguration(configuration);
         }
+        saveConfiguration(configuration);
     }
 }

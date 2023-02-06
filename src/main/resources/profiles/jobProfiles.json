@@ -6,9 +6,9 @@
     "description": "",
     "dataType": "MARC",
     "deleted": false,
+    "hidden": true,
     "parentProfiles": [],
-    "childProfiles": [],
-    "hidden": true
+    "childProfiles": []
   },
   "addedRelations": [
     {
