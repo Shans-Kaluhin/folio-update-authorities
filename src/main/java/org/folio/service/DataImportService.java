@@ -55,7 +55,7 @@ public class DataImportService {
         if (isJobFinished(job.getStatus())) {
             progressBar.close();
         } else {
-            TimeUnit.SECONDS.sleep(20);
+            TimeUnit.SECONDS.sleep(5);
             waitForJobFinishing(progressBar, jobId);
         }
     }
