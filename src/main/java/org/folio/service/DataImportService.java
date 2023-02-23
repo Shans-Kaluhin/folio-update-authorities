@@ -18,7 +18,7 @@ import static org.folio.model.enums.JobStatus.NOT_FOUND;
 
 @Slf4j
 public class DataImportService {
-    private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] org.folio.service.DataImportService      : ";
+    private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] : ";
     private final DataImportClient dataImportClient;
 
     public DataImportService(DataImportClient dataImportClient) {
@@ -65,7 +65,7 @@ public class DataImportService {
                 .setInitialMax(recordsAmount)
                 .setTaskName(STATUS_BAR_TITLE + title)
                 .setStyle(ProgressBarStyle.ASCII)
-                .setMaxRenderedLength(STATUS_BAR_TITLE.length() + 70)
+                .setMaxRenderedLength(STATUS_BAR_TITLE.length() + 80)
                 .build();
     }
 

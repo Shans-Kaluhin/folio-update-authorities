@@ -9,5 +9,6 @@ import java.util.List;
 public class ParsedRecord {
     private String id;
     private String leader;
+    private String externalId;
     private List<MarcField> fields;
 }

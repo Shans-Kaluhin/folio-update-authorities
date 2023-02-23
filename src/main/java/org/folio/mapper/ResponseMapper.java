@@ -100,7 +100,8 @@ public class ResponseMapper {
         var content = parsedRecord.get("content");
         var leader = content.get("leader").asText();
         var fields = mapRecordFields(content);
+        var externalId = jsonNode.get("externalIdsHolder").get("authorityId").asText();
 
-        return new ParsedRecord(id, leader, fields);
+        return new ParsedRecord(id, leader, externalId, fields);
     }
 }
