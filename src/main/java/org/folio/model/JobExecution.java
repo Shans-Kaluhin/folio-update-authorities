@@ -9,6 +9,7 @@ public class JobExecution {
     private String id;
     private String status;
     private String uiStatus;
+    private String fileId;
     private int current;
     private int total;
 }

@@ -7,7 +7,6 @@ import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarStyle;
 import org.folio.client.DataImportClient;
 
-import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import static org.folio.model.enums.JobStatus.CANCELLED;
@@ -25,12 +24,12 @@ public class DataImportService {
         this.dataImportClient = dataImportClient;
     }
 
-    public void updateAuthority(Path authorityMrcFile, int recordsAmount) {
-        var uploadDefinition = dataImportClient.uploadDefinition(authorityMrcFile);
+    public void updateAuthority(String fileBody, int recordsAmount) {
+        var uploadDefinition = dataImportClient.uploadDefinition(fileBody);
         log.info("Update authority job id: {}", uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
-        dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
+        dataImportClient.uploadJobProfile(uploadDefinition, "samples/jobProfileInfo.json");
 
         waitForJobFinishing(buildProgressBar("Update Authorities", recordsAmount), uploadDefinition.getJobExecutionId());
     }

@@ -5,16 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.folio.model.JobExecution;
-import org.folio.model.ParsedRecord;
 import org.folio.model.UploadDefinition;
 import org.folio.model.enums.JobStatus;
 
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.folio.mapper.MarcMapper.mapRecordFields;
 
 @Slf4j
 public class ResponseMapper {
@@ -34,39 +30,66 @@ public class ResponseMapper {
         for (var job : jobs) {
             var id = job.get("id").asText();
             if (jobId.equals(id)) {
-                return mapToJobExecution(job);
+                return mapToImportJobExecution(job);
             }
-        }
-       return mapToEmptyJobExecution();
-    }
-
-    @SneakyThrows
-    public static JobExecution mapToFirstJobExecution(String json) {
-        var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
-
-        if (jobs.has(0)) {
-            return mapToJobExecution(jobs.get(0));
         }
         return mapToEmptyJobExecution();
     }
 
-    public static JobExecution mapToJobExecution(JsonNode job) {
-            var id = job.get("id").asText();
-            var progress = job.get("progress");
-            var status = job.get("status").asText();
-            var uiStatus = job.get("uiStatus").asText();
-            var current = progress.get("current").asInt();
-            var total = progress.get("total").asInt();
+    @SneakyThrows
+    public static JobExecution mapToFirstImportJobExecution(String json) {
+        var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
 
-            return new JobExecution(id, status, uiStatus, current, total);
-    }
-
-    public static JobExecution mapToEmptyJobExecution() {
-        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING", 0, 0);
+        if (jobs.has(0)) {
+            return mapToImportJobExecution(jobs.get(0));
+        }
+        return mapToEmptyJobExecution();
     }
 
     @SneakyThrows
-    public static UploadDefinition mapUploadDefinition(String json, Path filePath) {
+    public static JobExecution mapToFirstExportJobExecution(String json) {
+        var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
+
+        if (jobs.has(0)) {
+            return mapToExportJobExecution(jobs.get(0));
+        }
+        return mapToEmptyJobExecution();
+    }
+
+    public static JobExecution mapToExportJobExecution(JsonNode job) {
+        var id = job.get("id").asText();
+        var progress = job.get("progress");
+        var files = job.get("exportedFiles");
+        var status = job.get("status").asText();
+        var exported = progress.get("exported").asInt();
+        var failed = progress.get("failed").asInt();
+        var total = progress.get("total").asInt();
+
+        String fileId = null;
+        if (files != null) {
+            fileId = files.get(0).get("fileId").asText();
+        }
+
+        return new JobExecution(id, status, status + ' ', fileId, exported + failed, total);
+    }
+
+    public static JobExecution mapToImportJobExecution(JsonNode job) {
+        var id = job.get("id").asText();
+        var progress = job.get("progress");
+        var status = job.get("status").asText();
+        var uiStatus = job.get("uiStatus").asText();
+        var current = progress.get("current").asInt();
+        var total = progress.get("total").asInt();
+
+        return new JobExecution(id, status, uiStatus + ' ', null, current, total);
+    }
+
+    public static JobExecution mapToEmptyJobExecution() {
+        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING ", null,0, 0);
+    }
+
+    @SneakyThrows
+    public static UploadDefinition mapUploadDefinition(String json, String fileBody) {
         var jsonBody = OBJECT_MAPPER.readTree(json);
 
         var fileDefinitions = jsonBody.findValue("fileDefinitions");
@@ -74,34 +97,19 @@ public class ResponseMapper {
         var jobExecutionId = fileDefinitions.findValue("jobExecutionId").asText();
         var fileId = fileDefinitions.findValue("id").asText();
 
-        return new UploadDefinition(uploadDefinitionId, jobExecutionId, fileId, filePath);
+        return new UploadDefinition(uploadDefinitionId, jobExecutionId, fileId, fileBody);
     }
 
     @SneakyThrows
-    public static List<ParsedRecord> mapToParsedRecords(String json) {
-        var jsonRecords = OBJECT_MAPPER.readTree(json).get("records");
+    public static List<String> mapToIds(String json) {
+        var jsonRecords = OBJECT_MAPPER.readTree(json).get("authorities");
 
-        var records = new ArrayList<ParsedRecord>();
+        var records = new ArrayList<String>();
         for (JsonNode record : jsonRecords) {
-            records.add(mapToParsedRecord(record));
+            var id = '"' + record.get("id").asText() + '"';
+            records.add(id);
         }
 
         return records;
-    }
-
-    private static ParsedRecord mapToParsedRecord(JsonNode jsonNode) {
-        var id = jsonNode.get("id").asText();
-
-        var parsedRecord = jsonNode.get("parsedRecord");
-        if (parsedRecord == null) {
-            return null;
-        }
-
-        var content = parsedRecord.get("content");
-        var leader = content.get("leader").asText();
-        var fields = mapRecordFields(content);
-        var externalId = jsonNode.get("externalIdsHolder").get("authorityId").asText();
-
-        return new ParsedRecord(id, leader, externalId, fields);
     }
 }

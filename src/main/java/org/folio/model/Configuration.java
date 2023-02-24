@@ -15,7 +15,7 @@ public class Configuration {
     private String username;
     private String password;
     private int importLimit;
-    private int srsLimit;
+    private int inventoryLimit;
     private int offset;
 
     public void incrementOffset(int increment) {

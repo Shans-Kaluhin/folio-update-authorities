@@ -1,32 +1,57 @@
 package org.folio.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.folio.model.Configuration;
 import org.folio.util.HttpWorker;
 
-import static org.folio.FolioUpdateAuthoritiesApp.exitWithError;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.folio.mapper.ResponseMapper.mapResponseToJson;
+import static org.folio.mapper.ResponseMapper.mapToIds;
 
 @Slf4j
 public class InventoryClient {
-    private static final String GET_AUTHORITY_RECORD_PATH = "/authority-storage/authorities/%s";
+    private static final String GET_RECORDS_PATH = "/authority-storage/authorities?limit=%s&offset=%s";
     private final HttpWorker httpWorker;
 
     public InventoryClient(HttpWorker httpWorker) {
         this.httpWorker = httpWorker;
     }
 
-    public boolean isAuthorityExist(String id) {
-        String uri = String.format(GET_AUTHORITY_RECORD_PATH, id);
+    public List<String> retrieveIdsPartitionaly(Configuration configuration, int total) {
+        var result = new ArrayList<String>();
+        var offset = configuration.getOffset();
+
+        while (result.size() < configuration.getImportLimit() && offset < total) {
+            var records = retrieveIds(configuration.getInventoryLimit(), offset, total);
+            result.addAll(records);
+            offset += records.size();
+        }
+        return result;
+    }
+
+    public List<String> retrieveIds(int limit, int offset, int total) {
+        int retrieveTo = Math.min(total, offset + limit);
+        log.info("Retrieving inventory records from {} to {}...", offset, retrieveTo);
+        String uri = String.format(GET_RECORDS_PATH, limit, offset);
 
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);
 
-        if (response.statusCode() == 200) {
-            return true;
-        } else if (response.statusCode() == 404) {
-            return false;
-        }else {
-            exitWithError("Failed to get inventory records. Response: " + response.body());
-            return false;
-        }
+        httpWorker.verifyStatus(response, 200, "Failed to get inventory records");
+
+        return mapToIds(response.body());
+    }
+
+    public int retrieveTotalRecords() {
+        String uri = String.format(GET_RECORDS_PATH, 0, 0);
+
+        var request = httpWorker.constructGETRequest(uri);
+        var response = httpWorker.sendRequest(request);
+
+        httpWorker.verifyStatus(response, 200, "Failed to get inventory total records");
+
+        return mapResponseToJson(response).findValue("totalRecords").asInt();
     }
 }

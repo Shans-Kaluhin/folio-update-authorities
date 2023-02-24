@@ -9,8 +9,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithError;
 
@@ -40,10 +38,10 @@ public class HttpWorker {
     }
 
     @SneakyThrows
-    public HttpRequest constructPOSTRequest(String uri, Path filePath) {
+    public HttpRequest constructFilePOSTRequest(String uri, String fileBody) {
         return constructRequest(uri)
                 .header("Content-Type", "application/octet-stream")
-                .POST(HttpRequest.BodyPublishers.ofByteArray(Files.readAllBytes(filePath)))
+                .POST(HttpRequest.BodyPublishers.ofByteArray(fileBody.getBytes(StandardCharsets.UTF_8)))
                 .build();
     }
 
@@ -66,6 +64,12 @@ public class HttpWorker {
         return builder;
     }
 
+    public HttpRequest constructExternalRequest(String url) {
+        return HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+    }
+
     @SneakyThrows
     public HttpResponse<String> sendRequest(HttpRequest request) {
         return HttpClient.newHttpClient()
@@ -74,7 +78,7 @@ public class HttpWorker {
 
     public void verifyStatus(HttpResponse<?> response, int expectedStatus, String errorMessage) {
         if (response.statusCode() != expectedStatus) {
-            exitWithError(errorMessage + " Response: " + response.body());
+            exitWithError(errorMessage + "\nResponse: " + response.body());
         }
     }
 }
