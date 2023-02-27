@@ -18,6 +18,7 @@ import static org.folio.model.enums.JobStatus.NOT_FOUND;
 @Slf4j
 public class DataImportService {
     private static final String STATUS_BAR_TITLE = "IMPORT-PROGRESS-BAR  INFO --- [main] : ";
+    private static final int STATUS_CHECK_INTERVAL = 2;
     private final DataImportClient dataImportClient;
 
     public DataImportService(DataImportClient dataImportClient) {
@@ -54,7 +55,7 @@ public class DataImportService {
         if (isJobFinished(job.getStatus())) {
             progressBar.close();
         } else {
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(STATUS_CHECK_INTERVAL);
             waitForJobFinishing(progressBar, jobId);
         }
     }

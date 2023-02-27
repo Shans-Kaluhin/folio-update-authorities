@@ -18,6 +18,7 @@ import static org.folio.model.enums.JobStatus.FAIL;
 @Slf4j
 public class DataExportService {
     private static final String STATUS_BAR_TITLE = "EXPORT-PROGRESS-BAR  INFO --- [main] : Export Authorities";
+    private static final int STATUS_CHECK_INTERVAL = 1;
     private final DataExportClient dataExportClient;
 
     public DataExportService(DataExportClient dataExportClient) {
@@ -47,7 +48,7 @@ public class DataExportService {
             progressBar.close();
             return job;
         } else {
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(STATUS_CHECK_INTERVAL);
             return waitForJobFinishing(progressBar, jobId);
         }
     }
