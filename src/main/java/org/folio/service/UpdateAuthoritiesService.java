@@ -12,6 +12,7 @@ import org.folio.util.HttpWorker;
 import org.springframework.stereotype.Service;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithMessage;
+import static org.folio.model.enums.JobStatus.FAIL;
 import static org.folio.util.FileWorker.saveConfiguration;
 
 @Slf4j
@@ -49,21 +50,27 @@ public class UpdateAuthoritiesService {
         var totalRecords = inventoryClient.retrieveTotalRecords();
         validateConfiguration(totalRecords);
 
-        jobProfileService.populateProfiles();
+        jobProfileService.populateExportProfiles();
+        jobProfileService.populateImportProfiles();
         while (configuration.getOffset() < totalRecords) {
             var ids = inventoryClient.retrieveIdsPartitionaly(configuration, totalRecords);
             if (ids.isEmpty()) {
                 log.info("There is no inventory records to update left");
                 break;
             }
-             log.info(ids.toString());
+
             configuration.incrementOffset(ids.size());
             saveConfiguration(configuration);
 
-            var fileBody = dataExportService.exportInventoryRecords(ids);
+            var exportJob = dataExportService.exportInventoryRecords(ids);
+            if (exportJob.getStatus().equals(FAIL.name())) {
+                log.info("Export job was failed");
+                continue;
+            }
+            var fileBody = dataExportService.downloadFile(exportJob);
             importService.updateAuthority(fileBody, ids.size());
         }
-        jobProfileService.deleteProfiles();
+        jobProfileService.deleteImportProfiles();
     }
 
     private void validateConfiguration(int totalRecords) {

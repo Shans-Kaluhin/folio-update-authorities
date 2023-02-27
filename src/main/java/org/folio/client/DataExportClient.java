@@ -8,13 +8,14 @@ import java.util.List;
 
 import static org.folio.mapper.ResponseMapper.mapResponseToJson;
 import static org.folio.mapper.ResponseMapper.mapToFirstExportJobExecution;
+import static org.folio.model.enums.JobProfile.EXPORT_JOB_PROFILE;
 
 @Slf4j
 public class DataExportClient {
-    private static final String UPLOAD_DEFINITION_BODY = "{\n" +
-            "    \"jobProfileId\": \"56944b1c-f3f9-475b-bed0-7387c33620ce\",\n" +
-            "    \"recordType\": \"AUTHORITY\",\n" +
-            "    \"type\": \"uuid\",\n" +
+    private static final String UPLOAD_DEFINITION_BODY = "{ " +
+            "    \"jobProfileId\": \"%s\"," +
+            "    \"recordType\": \"AUTHORITY\"," +
+            "    \"type\": \"uuid\"," +
             "    \"uuids\": %s" +
             "}";
     private static final String QUICK_EXPORT_PATH = "/data-export/quick-export";
@@ -27,12 +28,12 @@ public class DataExportClient {
     }
 
     public String exportIds(List<String> ids) {
-        String body = String.format(UPLOAD_DEFINITION_BODY, ids.toString());
+        String body = String.format(UPLOAD_DEFINITION_BODY, EXPORT_JOB_PROFILE.getId(), ids.toString());
 
         var request = httpWorker.constructPOSTRequest(QUICK_EXPORT_PATH, body);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to upload definition");
+        httpWorker.verifyStatus(response, 200, "Failed to export inventory ids");
 
         return mapResponseToJson(response).get("jobExecutionId").asText();
     }
@@ -43,7 +44,7 @@ public class DataExportClient {
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to get upload definition");
+        httpWorker.verifyStatus(response, 200, "Failed to get export job");
 
         return mapToFirstExportJobExecution(response.body());
     }
@@ -54,7 +55,7 @@ public class DataExportClient {
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to get upload definition");
+        httpWorker.verifyStatus(response, 200, "Failed to get exported file link");
 
         var link = mapResponseToJson(response).get("link").asText();
 
@@ -65,7 +66,7 @@ public class DataExportClient {
         var request = httpWorker.constructExternalRequest(link);
         var response = httpWorker.sendRequest(request);
 
-        httpWorker.verifyStatus(response, 200, "Failed to get upload definition");
+        httpWorker.verifyStatus(response, 200, "Failed to download exported file");
 
         return response.body();
     }

@@ -8,15 +8,24 @@ import static org.folio.util.FileWorker.getJsonObject;
 
 public class JobProfilesClient {
     private static final String DATA_IMPORT_PROFILES_PATH = "/data-import-profiles/";
+    private static final String DATA_EXPORT_PROFILES_PATH = "/data-export/";
     private final HttpWorker httpWorker;
 
     public JobProfilesClient(HttpWorker httpWorker) {
         this.httpWorker = httpWorker;
     }
 
-    public void createJobProfile(JobProfile jobProfile) {
+    public void createExportJobProfile(JobProfile jobProfile) {
+        var url = DATA_EXPORT_PROFILES_PATH + jobProfile.getUrl();
+        var profile = getJsonObject("exportProfiles/" + jobProfile.getUrl() + ".json");
+
+        var request = httpWorker.constructPOSTRequest(url, profile.toString());
+        httpWorker.sendRequest(request);
+    }
+
+    public void createImportJobProfile(JobProfile jobProfile) {
         var url = DATA_IMPORT_PROFILES_PATH + jobProfile.getUrl();
-        var profile = getJsonObject("profiles/" + jobProfile.getUrl() + ".json");
+        var profile = getJsonObject("importProfiles/" + jobProfile.getUrl() + ".json");
 
         var request = httpWorker.constructPOSTRequest(url, profile.toString());
         var response = httpWorker.sendRequest(request);

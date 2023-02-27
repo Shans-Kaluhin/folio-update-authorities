@@ -17,20 +17,23 @@ import static org.folio.model.enums.JobStatus.FAIL;
 
 @Slf4j
 public class DataExportService {
-    private static final String STATUS_BAR_TITLE = "EXPORT-PROGRESS-BAR  INFO --- [main] :";
+    private static final String STATUS_BAR_TITLE = "EXPORT-PROGRESS-BAR  INFO --- [main] : Export Authorities";
     private final DataExportClient dataExportClient;
 
     public DataExportService(DataExportClient dataExportClient) {
         this.dataExportClient = dataExportClient;
     }
 
-    public String exportInventoryRecords(List<String> inventoryIds) {
+    public String downloadFile(JobExecution jobExecution) {
+        return dataExportClient.retrieveJobExecutionFile(jobExecution);
+    }
+
+    public JobExecution exportInventoryRecords(List<String> inventoryIds) {
         var jobId = dataExportClient.exportIds(inventoryIds);
 
         log.info("Export authority job id: {}", jobId);
-        var job = waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
 
-        return dataExportClient.retrieveJobExecutionFile(job);
+        return waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
     }
 
     @SneakyThrows

@@ -1,0 +1,8 @@
+{
+  "id" : "56944b1c-f3f9-475b-bed0-7387c33620ce",
+  "name" : "Default authority export job profile",
+  "default" : true,
+  "destination" : "fileSystem",
+  "description" : "Default authority job profile",
+  "mappingProfileId" : "5d636597-a59d-4391-a270-4e79d5ba70e3"
+}

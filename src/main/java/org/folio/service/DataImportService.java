@@ -29,7 +29,7 @@ public class DataImportService {
         log.info("Update authority job id: {}", uploadDefinition.getJobExecutionId());
 
         dataImportClient.uploadFile(uploadDefinition);
-        dataImportClient.uploadJobProfile(uploadDefinition, "samples/jobProfileInfo.json");
+        dataImportClient.uploadJobProfile(uploadDefinition, "jobProfileInfo.json");
 
         waitForJobFinishing(buildProgressBar("Update Authorities", recordsAmount), uploadDefinition.getJobExecutionId());
     }

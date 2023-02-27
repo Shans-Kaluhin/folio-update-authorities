@@ -85,7 +85,7 @@ public class ResponseMapper {
     }
 
     public static JobExecution mapToEmptyJobExecution() {
-        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING ", null,0, 0);
+        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING ", null, 0, 0);
     }
 
     @SneakyThrows

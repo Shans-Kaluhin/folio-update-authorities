@@ -12,19 +12,25 @@ public class JobProfileService {
         this.client = client;
     }
 
-    public void populateProfiles() {
-        log.info("Populating default job profiles...");
-        client.createJobProfile(JobProfile.MATCH_PROFILE);
-        client.createJobProfile(JobProfile.MAPPING_PROFILE);
-        client.createJobProfile(JobProfile.ACTION_PROFILE);
-        client.createJobProfile(JobProfile.JOB_PROFILE);
+    public void populateExportProfiles() {
+        log.info("Populating default export job profiles...");
+        client.createExportJobProfile(JobProfile.EXPORT_MAPPING_PROFILE);
+        client.createExportJobProfile(JobProfile.EXPORT_JOB_PROFILE);
     }
 
-    public void deleteProfiles() {
-        log.info("Deleting default job profiles...");
-        client.deleteJobProfile(JobProfile.JOB_PROFILE);
-        client.deleteJobProfile(JobProfile.MATCH_PROFILE);
-        client.deleteJobProfile(JobProfile.ACTION_PROFILE);
-        client.deleteJobProfile(JobProfile.MAPPING_PROFILE);
+    public void populateImportProfiles() {
+        log.info("Populating default import job profiles...");
+        client.createImportJobProfile(JobProfile.IMPORT_MATCH_PROFILE);
+        client.createImportJobProfile(JobProfile.IMPORT_MAPPING_PROFILE);
+        client.createImportJobProfile(JobProfile.IMPORT_ACTION_PROFILE);
+        client.createImportJobProfile(JobProfile.IMPORT_JOB_PROFILE);
+    }
+
+    public void deleteImportProfiles() {
+        log.info("Deleting default import job profiles...");
+        client.deleteJobProfile(JobProfile.IMPORT_JOB_PROFILE);
+        client.deleteJobProfile(JobProfile.IMPORT_MATCH_PROFILE);
+        client.deleteJobProfile(JobProfile.IMPORT_ACTION_PROFILE);
+        client.deleteJobProfile(JobProfile.IMPORT_MAPPING_PROFILE);
     }
 }

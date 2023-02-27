@@ -1,0 +1,9 @@
+{
+  "id" : "5d636597-a59d-4391-a270-4e79d5ba70e3",
+  "name" : "Default authority mapping profile",
+  "default" : true,
+  "description" : "Default authority profile for MARC for authority record",
+  "recordTypes" : [ "AUTHORITY" ],
+  "transformations" : [ ],
+  "outputFormat" : "MARC"
+}

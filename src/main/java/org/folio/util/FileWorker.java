@@ -6,14 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.folio.model.Configuration;
 import org.springframework.util.ResourceUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.List;
 
 import static org.folio.FolioUpdateAuthoritiesApp.exitWithError;
 

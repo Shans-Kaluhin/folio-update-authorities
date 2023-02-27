@@ -12,7 +12,7 @@ import static org.folio.mapper.ResponseMapper.mapToIds;
 
 @Slf4j
 public class InventoryClient {
-    private static final String GET_RECORDS_PATH = "/authority-storage/authorities?limit=%s&offset=%s";
+    private static final String GET_RECORDS_PATH = "/authority-storage/authorities?offset=%s&limit=%s";
     private final HttpWorker httpWorker;
 
     public InventoryClient(HttpWorker httpWorker) {
@@ -25,6 +25,10 @@ public class InventoryClient {
 
         while (result.size() < configuration.getImportLimit() && offset < total) {
             var records = retrieveIds(configuration.getInventoryLimit(), offset, total);
+            if (records.isEmpty()) {
+                log.info("Inventory storage returned empty result");
+                break;
+            }
             result.addAll(records);
             offset += records.size();
         }
@@ -33,8 +37,8 @@ public class InventoryClient {
 
     public List<String> retrieveIds(int limit, int offset, int total) {
         int retrieveTo = Math.min(total, offset + limit);
+        var uri = String.format(GET_RECORDS_PATH, offset, limit);
         log.info("Retrieving inventory records from {} to {}...", offset, retrieveTo);
-        String uri = String.format(GET_RECORDS_PATH, limit, offset);
 
         var request = httpWorker.constructGETRequest(uri);
         var response = httpWorker.sendRequest(request);

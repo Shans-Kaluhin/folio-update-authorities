@@ -9,7 +9,7 @@ import static org.folio.mapper.ResponseMapper.mapResponseToJson;
 import static org.folio.mapper.ResponseMapper.mapToFirstImportJobExecution;
 import static org.folio.mapper.ResponseMapper.mapToJobExecutionById;
 import static org.folio.mapper.ResponseMapper.mapUploadDefinition;
-import static org.folio.model.enums.JobProfile.JOB_PROFILE;
+import static org.folio.model.enums.JobProfile.IMPORT_JOB_PROFILE;
 import static org.folio.util.FileWorker.getJsonObject;
 
 public class DataImportClient {
@@ -72,7 +72,7 @@ public class DataImportClient {
     }
 
     public JobExecution retrieveJobExecution(String jobId) {
-        var getJobStatusPath = String.format(JOB_EXECUTION_PATH, JOB_PROFILE.getId());
+        var getJobStatusPath = String.format(JOB_EXECUTION_PATH, IMPORT_JOB_PROFILE.getId());
 
         var request = httpWorker.constructGETRequest(getJobStatusPath);
         var response = httpWorker.sendRequest(request);
