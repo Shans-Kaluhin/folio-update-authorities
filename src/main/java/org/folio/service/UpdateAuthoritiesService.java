@@ -89,12 +89,12 @@ public class UpdateAuthoritiesService {
         }
 
         if (configuration.getInventoryLimit() < 1) {
-            log.warn("SRS limit is 0. Set it to 5000");
+            log.warn("Inventory limit is 0. Set it to 5000");
             configuration.setInventoryLimit(5000);
         }
 
         if (configuration.getInventoryLimit() > configuration.getImportLimit()) {
-            log.warn("SRS limit is bigger then import. It will be reduced to import limit");
+            log.warn("Inventory limit is bigger then import. It will be reduced to import limit");
             configuration.setInventoryLimit(configuration.getImportLimit());
         }
 

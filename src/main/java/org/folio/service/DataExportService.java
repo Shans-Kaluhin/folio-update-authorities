@@ -36,7 +36,7 @@ public class DataExportService {
 
         var exportJob = waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
         if (exportJob.getStatus().equals(COMPLETED_WITH_ERRORS.name())) {
-            log.info("The export job contains errors. Some records contain corrupted data");
+            log.info("The export job finished with errors. Some records contain corrupted data");
         }
         return exportJob;
     }
