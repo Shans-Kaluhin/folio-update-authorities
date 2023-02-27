@@ -34,7 +34,11 @@ public class DataExportService {
 
         log.info("Export authority job id: {}", jobId);
 
-        return waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
+        var exportJob = waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
+        if (exportJob.getStatus().equals(COMPLETED_WITH_ERRORS.name())) {
+            log.info("The export job contains errors. Some records contain corrupted data");
+        }
+        return exportJob;
     }
 
     @SneakyThrows

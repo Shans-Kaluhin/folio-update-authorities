@@ -64,7 +64,7 @@ public class UpdateAuthoritiesService {
 
             var exportJob = dataExportService.exportInventoryRecords(ids);
             if (exportJob.getStatus().equals(FAIL.name())) {
-                log.info("Export job was failed");
+                log.info("Export job failed. Continue with next records");
                 continue;
             }
             var fileBody = dataExportService.downloadFile(exportJob);
