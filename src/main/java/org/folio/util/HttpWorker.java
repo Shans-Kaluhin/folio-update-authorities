@@ -55,6 +55,7 @@ public class HttpWorker {
 
     public HttpRequest.Builder constructRequest(String uri) {
         var builder = HttpRequest.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
                 .uri(URI.create(configuration.getOkapiUrl() + uri))
                 .header("x-okapi-tenant", configuration.getTenant());
 

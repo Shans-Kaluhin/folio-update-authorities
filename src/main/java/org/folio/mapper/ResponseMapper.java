@@ -17,7 +17,6 @@ public class ResponseMapper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-
     @SneakyThrows
     public static JsonNode mapResponseToJson(HttpResponse<String> response) {
         return OBJECT_MAPPER.readTree(response.body());
@@ -66,7 +65,7 @@ public class ResponseMapper {
         var total = progress.get("total").asInt();
 
         String fileId = null;
-        if (files != null) {
+        if (files != null && files.size() != 0) {
             fileId = files.get(0).get("fileId").asText();
         }
 
