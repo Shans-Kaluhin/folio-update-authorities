@@ -39,8 +39,8 @@ public class DataExportService {
         if (jobStatus.equals(COMPLETED_WITH_ERRORS.name())) {
             log.info("The export job finished with errors. Some records contain corrupted data");
         } else if (jobStatus.equals(FAIL.name()) && exportJob.getExported() > 0) {
-            log.info("The export job was failed but there records was exported. See MDEXP-588");
-            log.info("Trying to export same ids again");
+            log.info("The export job failed, but the records were exported. See MDEXP-588");
+            log.info("Trying to export the same UUIDs again");
             return exportInventoryRecords(inventoryIds);
         }
         return exportJob;
