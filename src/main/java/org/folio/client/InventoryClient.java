@@ -12,7 +12,7 @@ import static org.folio.mapper.ResponseMapper.mapToIds;
 
 @Slf4j
 public class InventoryClient {
-    private static final String GET_RECORDS_PATH = "/authority-storage/authorities?offset=%s&limit=%s";
+    private static final String GET_RECORDS_PATH = "/authority-storage/authorities?offset=%s&limit=%s&query=id==*+sortBy+id";
     private final HttpWorker httpWorker;
 
     public InventoryClient(HttpWorker httpWorker) {
