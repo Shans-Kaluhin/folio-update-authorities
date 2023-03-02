@@ -1,7 +1,7 @@
 package org.folio.client;
 
 import lombok.extern.slf4j.Slf4j;
-import org.folio.model.JobExecution;
+import org.folio.model.ExportJobExecution;
 import org.folio.util.HttpWorker;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class DataExportClient {
         return mapResponseToJson(response).get("jobExecutionId").asText();
     }
 
-    public JobExecution retrieveJobExecution(String jobId) {
+    public ExportJobExecution retrieveJobExecution(String jobId) {
         var uri = String.format(DATA_EXPORT_JOB_PATH, jobId);
 
         var request = httpWorker.constructGETRequest(uri);
@@ -49,7 +49,7 @@ public class DataExportClient {
         return mapToFirstExportJobExecution(response.body());
     }
 
-    public String retrieveJobExecutionFile(JobExecution jobExecution) {
+    public String retrieveJobExecutionFile(ExportJobExecution jobExecution) {
         var uri = String.format(DATA_EXPORT_FILE_PATH, jobExecution.getId(), jobExecution.getFileId());
 
         var request = httpWorker.constructGETRequest(uri);

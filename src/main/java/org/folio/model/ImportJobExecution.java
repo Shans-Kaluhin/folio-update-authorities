@@ -5,11 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class JobExecution {
+public class ImportJobExecution {
     private String id;
     private String status;
     private String uiStatus;
-    private String fileId;
-    private int current;
     private int total;
+    private int current;
 }

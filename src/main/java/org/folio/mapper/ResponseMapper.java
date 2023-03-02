@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.folio.model.JobExecution;
+import org.folio.model.ExportJobExecution;
+import org.folio.model.ImportJobExecution;
 import org.folio.model.UploadDefinition;
-import org.folio.model.enums.JobStatus;
 
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.folio.model.enums.JobStatus.INITIALIZING;
+import static org.folio.model.enums.JobStatus.NOT_FOUND;
 
 @Slf4j
 public class ResponseMapper {
@@ -23,7 +26,7 @@ public class ResponseMapper {
     }
 
     @SneakyThrows
-    public static JobExecution mapToJobExecutionById(String json, String jobId) {
+    public static ImportJobExecution mapToJobExecutionById(String json, String jobId) {
         var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
 
         for (var job : jobs) {
@@ -32,30 +35,30 @@ public class ResponseMapper {
                 return mapToImportJobExecution(job);
             }
         }
-        return mapToEmptyJobExecution();
+        return mapToEmptyImportJobExecution();
     }
 
     @SneakyThrows
-    public static JobExecution mapToFirstImportJobExecution(String json) {
+    public static ImportJobExecution mapToFirstImportJobExecution(String json) {
         var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
 
         if (jobs.has(0)) {
             return mapToImportJobExecution(jobs.get(0));
         }
-        return mapToEmptyJobExecution();
+        return mapToEmptyImportJobExecution();
     }
 
     @SneakyThrows
-    public static JobExecution mapToFirstExportJobExecution(String json) {
+    public static ExportJobExecution mapToFirstExportJobExecution(String json) {
         var jobs = OBJECT_MAPPER.readTree(json).get("jobExecutions");
 
         if (jobs.has(0)) {
             return mapToExportJobExecution(jobs.get(0));
         }
-        return mapToEmptyJobExecution();
+        return mapToEmptyExportJobExecution();
     }
 
-    public static JobExecution mapToExportJobExecution(JsonNode job) {
+    public static ExportJobExecution mapToExportJobExecution(JsonNode job) {
         var id = job.get("id").asText();
         var progress = job.get("progress");
         var files = job.get("exportedFiles");
@@ -69,10 +72,10 @@ public class ResponseMapper {
             fileId = files.get(0).get("fileId").asText();
         }
 
-        return new JobExecution(id, status, status + ' ', fileId, exported + failed, total);
+        return new ExportJobExecution(id, status, fileId, total, failed, exported);
     }
 
-    public static JobExecution mapToImportJobExecution(JsonNode job) {
+    public static ImportJobExecution mapToImportJobExecution(JsonNode job) {
         var id = job.get("id").asText();
         var progress = job.get("progress");
         var status = job.get("status").asText();
@@ -80,11 +83,15 @@ public class ResponseMapper {
         var current = progress.get("current").asInt();
         var total = progress.get("total").asInt();
 
-        return new JobExecution(id, status, uiStatus + ' ', null, current, total);
+        return new ImportJobExecution(id, status, uiStatus, total, current);
     }
 
-    public static JobExecution mapToEmptyJobExecution() {
-        return new JobExecution(null, JobStatus.NOT_FOUND.name(), "INITIALIZING ", null, 0, 0);
+    public static ImportJobExecution mapToEmptyImportJobExecution() {
+        return new ImportJobExecution(null, NOT_FOUND.name(), INITIALIZING.name(), 0, 0);
+    }
+
+    public static ExportJobExecution mapToEmptyExportJobExecution() {
+        return new ExportJobExecution(null, NOT_FOUND.name(), INITIALIZING.name(), 0, 0, 0);
     }
 
     @SneakyThrows

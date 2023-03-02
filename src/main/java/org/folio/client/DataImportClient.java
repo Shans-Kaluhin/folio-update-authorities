@@ -1,7 +1,7 @@
 package org.folio.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.folio.model.JobExecution;
+import org.folio.model.ImportJobExecution;
 import org.folio.model.UploadDefinition;
 import org.folio.util.HttpWorker;
 
@@ -71,7 +71,7 @@ public class DataImportClient {
         httpWorker.verifyStatus(response, 204, "Failed to upload job profile");
     }
 
-    public JobExecution retrieveJobExecution(String jobId) {
+    public ImportJobExecution retrieveJobExecution(String jobId) {
         var getJobStatusPath = String.format(JOB_EXECUTION_PATH, IMPORT_JOB_PROFILE.getId());
 
         var request = httpWorker.constructGETRequest(getJobStatusPath);
@@ -82,7 +82,7 @@ public class DataImportClient {
         return mapToJobExecutionById(response.body(), jobId);
     }
 
-    public JobExecution retrieveFirstInProgressJob() {
+    public ImportJobExecution retrieveFirstInProgressJob() {
         var request = httpWorker.constructGETRequest(ANY_JOB_IN_PROGRESS_PATH);
         var response = httpWorker.sendRequest(request);
 

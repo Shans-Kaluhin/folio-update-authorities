@@ -6,7 +6,7 @@ import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import me.tongfei.progressbar.ProgressBarStyle;
 import org.folio.client.DataExportClient;
-import org.folio.model.JobExecution;
+import org.folio.model.ExportJobExecution;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,28 +25,33 @@ public class DataExportService {
         this.dataExportClient = dataExportClient;
     }
 
-    public String downloadFile(JobExecution jobExecution) {
+    public String downloadFile(ExportJobExecution jobExecution) {
         return dataExportClient.retrieveJobExecutionFile(jobExecution);
     }
 
-    public JobExecution exportInventoryRecords(List<String> inventoryIds) {
+    public ExportJobExecution exportInventoryRecords(List<String> inventoryIds) {
         var jobId = dataExportClient.exportIds(inventoryIds);
 
         log.info("Export authority job id: {}", jobId);
 
         var exportJob = waitForJobFinishing(buildProgressBar(inventoryIds.size()), jobId);
-        if (exportJob.getStatus().equals(COMPLETED_WITH_ERRORS.name())) {
+        var jobStatus = exportJob.getStatus();
+        if (jobStatus.equals(COMPLETED_WITH_ERRORS.name())) {
             log.info("The export job finished with errors. Some records contain corrupted data");
+        } else if (jobStatus.equals(FAIL.name()) && exportJob.getExported() > 0) {
+            log.info("The export job was failed but there records was exported. See MDEXP-588");
+            log.info("Trying to export same ids again");
+            return exportInventoryRecords(inventoryIds);
         }
         return exportJob;
     }
 
     @SneakyThrows
-    private JobExecution waitForJobFinishing(ProgressBar progressBar, String jobId) {
+    private ExportJobExecution waitForJobFinishing(ProgressBar progressBar, String jobId) {
         var job = dataExportClient.retrieveJobExecution(jobId);
         progressBar.maxHint(job.getTotal());
-        progressBar.stepTo(job.getCurrent());
-        progressBar.setExtraMessage(job.getUiStatus());
+        progressBar.stepTo(job.getExported() + job.getFailed());
+        progressBar.setExtraMessage(job.getStatus());
 
         if (isJobFinished(job.getStatus())) {
             progressBar.close();
