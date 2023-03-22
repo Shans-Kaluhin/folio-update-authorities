@@ -3,7 +3,6 @@ package org.folio.service;
 import lombok.extern.slf4j.Slf4j;
 import org.folio.client.AuthClient;
 import org.folio.client.DataImportClient;
-import org.folio.client.InventoryClient;
 import org.folio.client.JobProfilesClient;
 import org.folio.client.SRSClient;
 import org.folio.model.Configuration;
@@ -21,7 +20,6 @@ public class UpdateAuthoritiesService {
     private SRSClient srsClient;
     private Configuration configuration;
     private DataImportService importService;
-    private InventoryService inventoryService;
     private JobProfileService jobProfileService;
     private MarcConverterService marcConverterService;
 
@@ -31,14 +29,12 @@ public class UpdateAuthoritiesService {
         var httpWorker = new HttpWorker(configuration);
         var authClient = new AuthClient(configuration, httpWorker);
         var importClient = new DataImportClient(httpWorker);
-        var inventoryClient = new InventoryClient(httpWorker);
         var jobProfileClient = new JobProfilesClient(httpWorker);
 
         srsClient = new SRSClient(httpWorker);
         importService = new DataImportService(importClient);
         jobProfileService = new JobProfileService(jobProfileClient);
         marcConverterService = new MarcConverterService();
-        inventoryService = new InventoryService(inventoryClient);
 
         httpWorker.setOkapiToken(authClient.authorize());
 
@@ -58,13 +54,6 @@ public class UpdateAuthoritiesService {
             if (records.isEmpty()) {
                 log.info("There is no srs records to update left");
                 break;
-            }
-
-            // Inventory filter should be removed after fixing MODDATAIMP-780
-            records = inventoryService.filterExistInventoryRecords(records);
-            if (records.isEmpty()) {
-                log.info("There is no linked inventory records to update left");
-                continue;
             }
 
             configuration.incrementOffset(records.size());
